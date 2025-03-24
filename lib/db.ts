@@ -8,6 +8,7 @@ export interface Database {
     trades: TradesTable;
     chats: ChatsTable
     messages: MessagesTable;
+    followings: FollowingsTable;
     posts: PostsTable;
     tags: TagsTable;
     posttags: PostTagsTable;
@@ -19,7 +20,8 @@ export interface UsersTable {
     name: string;
     email: string;
     password: string;
-    zip: number;
+    zip: string;
+    image: string;
     created: Date;
 }
 
@@ -31,6 +33,8 @@ export interface GoodsTable {
 export interface LocationsTable {
     id: string;
     address: string;
+    latitude: number;
+    longitude: number;
     totalTrades: number;
 }
 
@@ -58,10 +62,18 @@ export interface MessagesTable {
     timestamp: Date;
 }
 
+export interface FollowingsTable {
+    id: Generated<string>;
+    user_id: Generated<string>;
+    follower_id: Generated<string>;
+    timestamp: Date;
+}
+
 export interface PostsTable {
     id: Generated<string>;
     user_id: Generated<string>;
     text: string;
+    image: string;
     timestamp: Date;
 }
 export interface PostLikesTable {
