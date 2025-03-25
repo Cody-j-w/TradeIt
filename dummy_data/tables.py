@@ -132,9 +132,8 @@ def insert_posts():
             trade_status = "successful" if random.random(
             ) < 0.2 else "open"  # roughly 20% sucess rate
 
-            cursor.execute(
-                "INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
-                (user_id, trade_status, item_offered, text))
+            cursor.execute("INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
+                           (user_id, trade_status, item_offered, text))
 
     conn.commit()
     conn.close()
