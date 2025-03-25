@@ -4,8 +4,11 @@ import random
 
 fake = Faker()
 
-DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+# If you're Sean
+# DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
+# If you're Ace
+DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -26,6 +29,7 @@ def table_create():
         trade_status TEXT,
         tags TEXT,
         text TEXT,
+        goods TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id)
         )''')
 
@@ -128,6 +132,14 @@ def insert_posts():
 
             cursor.execute("INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
                            (user_id, trade_status, item_offered, text))
+
+    # Ok so good news
+    # Cody has attributed a "goods" field in place of relying on tags to have goods.
+    # Obvi people could use tags
+    # but having a field that is specifically a good or service makes things easier for him and for us.
+    # If we go with goods we won't have to worry about having to pre-process tags as they are now
+    # Instead we'll be looking directly at the goods field
+    # Anyway I'm going to make a new file for preprocessing now.
 
     conn.commit()
     conn.close()
