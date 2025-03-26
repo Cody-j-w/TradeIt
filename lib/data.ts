@@ -9,7 +9,9 @@ export async function userInformation() {
     if (session) {
         console.log(session?.user?.id);
         console.log(session?.user?.email);
+        return session;
     } else {
         console.log("please sign in");
     }
+
 }
