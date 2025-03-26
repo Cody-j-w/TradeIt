@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 fake = Faker()
 
 # If you're Sean
-# DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
 # If you're Ace
 DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
@@ -132,8 +132,9 @@ def insert_posts():
             trade_status = "successful" if random.random(
             ) < 0.2 else "open"  # roughly 20% sucess rate
 
-            cursor.execute("INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
-                           (user_id, trade_status, item_offered, text))
+            cursor.execute(
+                "INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
+                (user_id, trade_status, item_offered, text))
 
     conn.commit()
     conn.close()
