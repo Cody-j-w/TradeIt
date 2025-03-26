@@ -1,9 +1,6 @@
 import sqlite3
 from faker import Faker
 import random
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 fake = Faker()
 
