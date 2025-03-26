@@ -5,23 +5,26 @@ export interface Database {
     users: UsersTable;
     goods: GoodsTable;
     locations: LocationsTable;
+    traders: TradersTable;
     trades: TradesTable;
+    ratings: RatingsTable;
     chats: ChatsTable
     messages: MessagesTable;
     followings: FollowingsTable;
     posts: PostsTable;
     tags: TagsTable;
-    posttags: PostTagsTable;
-    postlikes: PostLikesTable;
+    users_tags: UsersTagsTable;
+    posts_tags: PostTagsTable;
+    posts_likes: PostLikesTable;
 }
 
 export interface UsersTable {
     id: Generated<string>;
     name: string;
     email: string;
-    password: string;
     zip: string;
     image: string;
+    slug: string;
     created: Date;
 }
 
@@ -31,21 +34,34 @@ export interface GoodsTable {
 }
 
 export interface LocationsTable {
-    id: string;
+    id: Generated<string>;
     address: string;
     latitude: number;
     longitude: number;
     totalTrades: number;
 }
 
+export interface TradersTable {
+    id: Generated<string>;
+    user: string;
+    good: string;
+    timestamp: Date;
+}
+
 export interface TradesTable {
     id: Generated<string>;
-    user_id1: Generated<string>;
-    user_id2: Generated<string>;
-    goods_id1: Generated<string>;
-    goods_id2: Generated<string>;
+    trader_a: Generated<string>;
+    trader_b: Generated<string>;
     location_id: Generated<string>;
+    like: boolean;
     timestamp: Date;
+}
+
+export interface RatingsTable {
+    id: Generated<string>;
+    trader_id: Generated<string>;
+    trade_id: Generated<string>;
+    rating: number;
 }
 
 export interface ChatsTable {
@@ -85,6 +101,11 @@ export interface PostLikesTable {
 export interface TagsTable {
     id: Generated<string>;
     name: string;
+}
+
+export interface UsersTagsTable {
+    user_id: Generated<string>;
+    tag_id: Generated<string>;
 }
 
 export interface PostTagsTable {
