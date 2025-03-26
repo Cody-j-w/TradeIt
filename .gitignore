@@ -34,9 +34,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# ML
-*.h5
-
-#seed files
-seed
+dummy_data/__pycache__/tables.cpython-39.pyc
