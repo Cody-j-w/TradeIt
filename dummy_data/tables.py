@@ -5,10 +5,10 @@ import random
 fake = Faker()
 
 # If you're Sean
-# DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
 # If you're Ace
-DB_PATH =r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
+# DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -114,11 +114,26 @@ def insert_posts():
 
     for user_id in range(1, 1001):
         for _ in range(random.randint(1, 25)):  # ! Each user makes 1 - 25 posts
-            fake_tags = ", ".join(random.sample(
-                trade_tags, k=random.randint(1, 3)))
-            cursor.execute("INSERT INTO posts (user_id, tags, text) VALUES (?, ?, ?)",
-                           (user_id, fake_tags, fake.text()))
-            
+            # selects random post type then offered item, and wanted item.
+            post_type = random.choice(["UTF", "ISO", "Service"])
+            item_offered = random.choice(trade_tags)
+            item_wanted = random.choice(trade_tags)
+
+            # generates structured post text
+            if post_type == "UFT":
+                text = f"UFT: {item_offered}, ISO: {item_wanted}."
+            elif post_type == "ISO":
+                text = f"ISO: {item_wanted}, UFT: {item_offered}."
+            else:
+                text = f"Offering {item_offered} services, looking for {item_wanted}."
+
+            trade_status = "successful" if random.random(
+            ) < 0.2 else "open"  # roughly 20% sucess rate
+
+            cursor.execute(
+                "INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
+                (user_id, trade_status, item_offered, text))
+
     # Ok so good news
     # Cody has attributed a "goods" field in place of relying on tags to have goods.
     # Obvi people could use tags
@@ -137,8 +152,8 @@ def insert_likes():
     cursor = conn.cursor()
 
     for _ in range(12500):  # 12500 random likes
-        user_id = random.randint(1, 500)
-        post_id = random.randint(1, 12500)  # high end amount of posts, 12500
+        user_id = random.randint(1, 1000)  # users to like posts
+        post_id = random.randint(1, 12500)  # posts for users to like
         cursor.execute("INSERT INTO likes (user_id, post_id) VALUES (?, ?)",
                        (user_id, post_id))
 
@@ -151,7 +166,7 @@ def insert_follows():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    for _ in range(2000):  # 2000 random follow relationships
+    for _ in range(4000):  # 2000 random follow relationships
         follower_id, following_id = random.sample(range(1, 2001), 2)
         cursor.execute("INSERT INTO follows (follower_id, following_id) VALUES (?, ?)",
                        (follower_id, following_id))
@@ -175,5 +190,4 @@ print("likes function is happy")
 insert_follows()
 print("follows function is happy")
 
-
-print("!!! everything worked (: !!!)")
+print("!!! everything worked !!!)")
