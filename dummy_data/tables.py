@@ -1,14 +1,17 @@
 import sqlite3
 from faker import Faker
 import random
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 fake = Faker()
 
 # If you're Sean
-# DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
 # If you're Ace
-DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
+# DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -130,8 +133,9 @@ def insert_posts():
             trade_status = "successful" if random.random(
             ) < 0.2 else "open"  # roughly 20% sucess rate
 
-            cursor.execute("INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
-                           (user_id, trade_status, item_offered, text))
+            cursor.execute(
+                "INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
+                (user_id, trade_status, item_offered, text))
 
     # Ok so good news
     # Cody has attributed a "goods" field in place of relying on tags to have goods.
@@ -165,7 +169,7 @@ def insert_follows():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    for _ in range(2000):  # 2000 random follow relationships
+    for _ in range(4000):  # 2000 random follow relationships
         follower_id, following_id = random.sample(range(1, 2001), 2)
         cursor.execute("INSERT INTO follows (follower_id, following_id) VALUES (?, ?)",
                        (follower_id, following_id))
@@ -188,6 +192,5 @@ print("likes function is happy")
 
 insert_follows()
 print("follows function is happy")
-
 
 print("!!! everything worked !!!)")
