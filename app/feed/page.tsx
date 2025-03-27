@@ -12,7 +12,7 @@ const Feed = () => {
 
 	return (
 		<div>
-			<div className="flex justify-around bg-gray-300">
+			<div className="flex justify-around bg-gray-300 text-trade-gray">
 				<button
 					className={`px-4 py-2 ${activeTab === 'Posts' ? 'border-b-2 border-trade-blue' : ''}`}
 					onClick={() => handleTabClick('Posts')}
@@ -28,8 +28,8 @@ const Feed = () => {
 			</div>
 
 			<div className="p-4">
-				{activeTab === 'Posts' && <div>Following content goes here.</div>}
-				{activeTab === 'Trades' && <div>Suggested content goes here.</div>}
+				{activeTab === 'Posts' && <div>Post content goes here.</div>}
+				{activeTab === 'Trades' && <div>Trade content goes here.</div>}
 			</div>
 		</div>
 	);

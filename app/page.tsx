@@ -12,7 +12,7 @@ const Home = () => {
 
     return (
         <div>
-            <div className="flex justify-center bg-gray-300">
+            <div className="flex justify-center bg-gray-300 text-trade-gray">
                 <button
                     className={`px-4 py-2 ${activeTab === 'Following' ? 'border-b-2 border-trade-blue' : ''}`}
                     onClick={() => handleTabClick('Following')}
