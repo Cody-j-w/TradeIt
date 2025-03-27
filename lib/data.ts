@@ -12,7 +12,6 @@ export async function userInformation() {
     } else {
         console.log("please sign in");
     }
-
 }
 
 export async function userExists(userEmail: string) {
