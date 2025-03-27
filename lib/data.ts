@@ -18,7 +18,7 @@ export async function userExists(userEmail: string) {
     try {
         const isUser =
             await sql`SELECT * FROM users WHERE email = ${userEmail}`;
-        return isUser.rows.length === 0;
+        return isUser.rows.length !== 0;
     } catch (err) {
         console.error("Database error:", err);
         throw new Error("Failed to check user");
