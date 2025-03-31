@@ -40,3 +40,74 @@ export async function userLogin(userEmail: string) {
         }
     }
 }
+
+export async function getUser(userEmail: string) {
+    const isUser = await userExists(userEmail);
+    if (isUser) {
+        const fetchedUser = await db
+            .selectFrom("users")
+            .select(['name', 'image', 'slug'])
+            .where('email', '=', userEmail)
+            .execute();
+        return fetchedUser[0];
+    }
+}
+
+export async function fetchGood(goodName: string) {
+    const fetchedGood = await db
+        .selectFrom("goods")
+        .select(['id', 'name'])
+        .where('name', '=', goodName)
+        .execute();
+    return fetchedGood;
+}
+
+export async function fetchGoods() {
+    const fetchedGoods = await db
+        .selectFrom("goods")
+        .select(['id', 'name'])
+        .execute();
+    return fetchedGoods;
+}
+
+export async function insertGood(goodName: string) {
+    const checkedGood = await fetchGood(goodName);
+    if (checkedGood.length === 0) {
+        const insertedGood = await db
+            .insertInto('goods')
+            .values({
+                name: goodName
+            })
+            .returning(['id', 'name'])
+            .executeTakeFirst();
+        return insertedGood;
+    } else {
+        return checkedGood[0];
+    }
+}
+
+export async function fetchLocation(locationAddress: string) {
+    const fetchedLocation = await db
+        .selectFrom('locations')
+        .select(['id', 'address', 'latitude', 'longitude'])
+        .where('address', '=', locationAddress)
+        .execute();
+    return fetchedLocation[0];
+}
+
+export async function fetchLocations() {
+    const fetchedLocations = await db
+        .selectFrom('locations')
+        .select(['id', 'address', 'latitude', 'longitude'])
+        .execute();
+    return fetchedLocations;
+}
+
+export async function insertLocation(address: string) {
+    // geolocation stuff to get coordinates
+    // then put address and coordinates into DB
+}
+
+export async function fetchPosts() {
+
+}
