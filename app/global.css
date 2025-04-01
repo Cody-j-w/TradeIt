@@ -1,0 +1,12 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+@theme {
+    --font-display: "Poppins", "sans-serif";
+
+    --color-trade-green: #1f6a3e;
+    --color-trade-orange: #fc9e40;
+    --color-trade-gray: #3a606e;
+    --color-trade-white: #e7ecef;
+    --color-trade-blue: #a3cef1;
+}
