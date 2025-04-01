@@ -13,7 +13,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 		 <head>
                 <link rel="icon" href="Bee.png" />
             </head>
-      <body className="antialiased bg-[url('/assets/paper.jpg')] bg-contain text-trade-gray min-h-screen">
+      <body className="antialiased bg-[url('@/public/paper.jpg')] bg-contain text-trade-gray min-h-screen">
         <SessionProvider>
           <NavBar />
           <div>
