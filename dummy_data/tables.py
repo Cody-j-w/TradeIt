@@ -5,10 +5,10 @@ import random
 fake = Faker()
 
 # If you're Sean
-DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+# DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
 # If you're Ace
-# DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
+DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
