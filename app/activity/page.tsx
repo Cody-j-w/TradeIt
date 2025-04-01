@@ -23,8 +23,8 @@ const fetchNotifications = async (): Promise<Activity[]> => {
 			username: 'JohnDoe',
 			time: '1 hour ago',
 			action: 'Commented on your post',
-			avatar: '/path/to/avatar1.jpg',
-			imageUrl: '/path/to/image1.jpg',
+			avatar: '',
+			imageUrl: null,
 			message: 'Great post!'
 		},
 		{
@@ -32,7 +32,7 @@ const fetchNotifications = async (): Promise<Activity[]> => {
 			username: 'JaneSmith',
 			time: '2 hours ago',
 			action: 'Started following you',
-			avatar: '/path/to/avatar2.jpg',
+			avatar: '',
 			imageUrl: null,
 			message: null
 		}
@@ -84,8 +84,7 @@ const Activity = () => {
 					<div key={activity.id} className="flex items-start py-4 border-b rounded-lg bg-trade-white border-gray-200">
 						<div className="relative w-12 h-12 rounded-full mr-4">
 							<img
-								src={activity.avatar}
-								alt={`${activity.username}'s avatar`}
+								
 								className=" ml-2 w-full h-full rounded-full"
 							/>
 							<div className="absolute top-1 left-1 w-2 h-2 bg-red-500 rounded-full"></div>
@@ -101,8 +100,7 @@ const Activity = () => {
 						</div>
 						{activity.imageUrl && (
 							<img
-								src={activity.imageUrl}
-								alt="Notification image"
+								
 								className="w-16 h-16 object-cover rounded ml-2 mr-4"
 							/>
 						)}
