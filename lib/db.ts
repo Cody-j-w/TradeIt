@@ -25,6 +25,7 @@ export interface UsersTable {
     zip: string;
     image: string;
     slug: string;
+    bio: string;
     created: Date;
 }
 
@@ -88,9 +89,11 @@ export interface FollowingsTable {
 export interface PostsTable {
     id: Generated<string>;
     user_id: Generated<string>;
+    good_id: Generated<string>;
     text: string;
     image: string;
     timestamp: Date;
+    bio: string;
 }
 export interface PostLikesTable {
     id: Generated<string>;
