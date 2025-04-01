@@ -109,5 +109,36 @@ export async function insertLocation(address: string) {
 }
 
 export async function fetchPosts() {
+    // ??? WHERE DO?
+}
 
+export async function insertPost(user: string, postText: string, good_id: string, image: string | null) {
+    const tags = await db
+        .selectFrom('tags')
+        .select('name')
+        .execute();
+    const newTags = [];
+    const tagNames = tags.map(tag => tag.name);
+    const postTags = postText.split("#").slice(1);
+    for (const tag of postTags) {
+        if (!tagNames.includes(tag)) {
+            newTags.push({ 'name': tag });
+        }
+    }
+
+    const tagInsert = await db
+        .insertInto('tags')
+        .values(newTags)
+        .returning(['id', 'name'])
+        .execute();
+
+    const newPost = await db
+        .insertInto('posts')
+        .values({
+            text: postText,
+            user_id: user,
+            image: image
+        })
+        .returning(['id'])
+        .execute()
 }
