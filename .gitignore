@@ -40,3 +40,6 @@ next-env.d.ts
 
 #seed files
 seed
+
+#python files
+*.pyc
