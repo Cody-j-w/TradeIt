@@ -177,9 +177,9 @@ def insert_posts():
             item_wanted = random.choice(goods[item_wanted_tag])
 
             if post_type == "UFT":
-                text = f"UFT: {item_offered}, ISO: {item_wanted}."
+                text = f"UFT: {item_offered}, Wanting: {item_wanted}."
             elif post_type == "ISO":
-                text = f"ISO: {item_wanted}, UFT: {item_offered}."
+                text = f"ISO: {item_wanted}, Offering: {item_offered}."
             else:
                 text = f"Offering {item_offered} services, looking for {item_wanted}."
 
