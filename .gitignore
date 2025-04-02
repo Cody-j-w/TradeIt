@@ -25,8 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
-.env
+.env*
 
 # vercel
 .vercel
@@ -34,9 +33,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+dummy_data/__pycache__/tables.cpython-39.pyc
+
 
 # ML
 *.h5
 
 #seed files
 seed
+
