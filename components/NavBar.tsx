@@ -57,14 +57,14 @@ const NavBar: React.FC = () => {
             style={{ opacity: pathname === "/profile" ? 1 : 0.6 }}
           />
         </Link>
-        <Link href="/notifications">
+        <Link href="/activity">
           <Image
             src={notifs}
             alt="Notifications"
             width={24}
             height={24}
             className="fill-current"
-            style={{ opacity: pathname === "/notifications" ? 1 : 0.6 }}
+            style={{ opacity: pathname === "/activity" ? 1 : 0.6 }}
           />
         </Link>
       </nav>
