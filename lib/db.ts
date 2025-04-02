@@ -95,7 +95,6 @@ export interface PostsTable {
     timestamp: Generated<Date>;
 }
 export interface PostLikesTable {
-    id: Generated<string>;
     user_id: Generated<string>;
     post_id: Generated<string>;
 }
@@ -111,7 +110,6 @@ export interface UsersTagsTable {
 }
 
 export interface PostTagsTable {
-    id: Generated<string>;
     post_id: Generated<string>;
     tag_id: Generated<string>;
 }
