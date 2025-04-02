@@ -64,7 +64,7 @@ def destroy_tables(conn):
                        DROP TABLE IF EXISTS follows;
                        ''')
         conn.commit()
-        print("Tables dropped successfully.")
+        print("Tables dropped successfully.\n Evil, you should be ashamed of yourself.")
     except sqlite3.Error as e:
         print(f"Error dropping tables: {e}")
     finally:
@@ -75,3 +75,39 @@ def destroy_tables(conn):
 
 # ! WARNING WILL KILL THE POOR TABLES. ps they had familys
 # destroy_tables(conn)
+
+
+if __name__ == "__main__":
+    while True:
+        print("1. Create sqlite tables")
+        print("2. Drop sqlite tables")
+        print("3. Exit")
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            create = input(
+                "Are you sure you want to create tables? (y/n): ").strip().lower() == "y"
+            if create:
+                table_create(conn)
+
+        elif choice == "2":
+            oneShotOneKill = input(
+                "Are you sure you want to drop all the tables? (y/n): ").strip().lower()
+            if oneShotOneKill == "y":
+                You_are_actually_doing_it = input(
+                    "ARE YOU REALLY SURE YOU WANT THIS? (y/n): ").strip().lower()
+                if You_are_actually_doing_it == "y":
+                    YouAreEvil = input(
+                        "Evil, I can't believe you would do this.\nOkay one last time (y/n): ").strip().lower()
+                    if YouAreEvil == "y":
+                        destroy_tables(conn)
+                    else:
+                        print("You are a good person, those tables have a family")
+            else:
+                print("Good for you, you wouldn't want table blood on your hands")
+
+        elif choice == "3":
+            break
+
+        else:
+            print("Invalid choice. Try again.")
