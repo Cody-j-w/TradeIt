@@ -25,6 +25,7 @@ export interface UsersTable {
     zip: string;
     image: string;
     slug: string;
+    bio: string;
     created: Date;
 }
 
@@ -88,12 +89,12 @@ export interface FollowingsTable {
 export interface PostsTable {
     id: Generated<string>;
     user_id: Generated<string>;
+    good_id: Generated<string>;
     text: string;
-    image: string;
-    timestamp: Date;
+    image: string | undefined;
+    timestamp: Generated<Date>;
 }
 export interface PostLikesTable {
-    id: Generated<string>;
     user_id: Generated<string>;
     post_id: Generated<string>;
 }
@@ -109,7 +110,6 @@ export interface UsersTagsTable {
 }
 
 export interface PostTagsTable {
-    id: Generated<string>;
     post_id: Generated<string>;
     tag_id: Generated<string>;
 }
