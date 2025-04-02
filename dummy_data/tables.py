@@ -1,17 +1,39 @@
 import sqlite3
 from faker import Faker
 import random
+from datetime import datetime, timedelta, time
+
 
 fake = Faker()
 
 # If you're Sean
-# DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
 # If you're Ace
-DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
+# DB_PATH = r"/home/acequantum/playtime/dummy_data/1_dummy_data.db"
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
+
+# Generating a random date
+
+
+def generate_random_dates(start_date, end_date):
+    delta = end_date - start_date
+    random_days = random.randint(0, delta.days)
+    random_date = start_date + timedelta(days=random_days)
+    return random_date.strftime('%Y-%m-%d')
+
+
+start_date = datetime.strptime('2025-03-01', '%Y-%m-%d')
+end_date = datetime.strptime('2025-03-31', '%Y-%m-%d')
+
+
+def generate_random_time():
+    hour = random.randint(0, 23)
+    minute = random.randint(0, 59)
+    second = random.randint(0, 59)
+    return time(hour, minute, second)
 
 
 def table_create():
@@ -30,6 +52,8 @@ def table_create():
         tags TEXT,
         text TEXT,
         goods TEXT,
+        date_posted DATE,
+        time_posted TIME,
         FOREIGN KEY (user_id) REFERENCES users(id)
         )''')
 
@@ -131,8 +155,8 @@ def insert_posts():
             ) < 0.2 else "open"  # roughly 20% sucess rate
 
             cursor.execute(
-                "INSERT INTO posts (user_id, trade_status, tags, text) VALUES (?, ?, ?, ?)",
-                (user_id, trade_status, item_offered, text))
+                "INSERT INTO posts (user_id, trade_status, tags, date_posted, time_posted, text) VALUES (?, ?, ?, ?, ?, ?)",
+                (user_id, trade_status, item_offered, generate_random_dates(start_date, end_date), generate_random_time().strftime('%H:%M:%S'), text))
 
     # Ok so good news
     # Cody has attributed a "goods" field in place of relying on tags to have goods.
