@@ -3,7 +3,6 @@ from faker import Faker
 import random
 from datetime import datetime, timedelta, time
 
-
 fake = Faker()
 
 # If you're Sean
@@ -14,8 +13,6 @@ DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
-
-# Generating a random date
 
 
 def generate_random_dates(start_date, end_date):
@@ -34,45 +31,6 @@ def generate_random_time():
     minute = random.randint(0, 59)
     second = random.randint(0, 59)
     return time(hour, minute, second)
-
-
-def table_create():
-    """Creating tables for test dummy data"""
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT,
-        zip_code INT(5),
-        bios TEXT
-        )''')
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        trade_status TEXT,
-        tags TEXT,
-        text TEXT,
-        goods TEXT,
-        date_posted DATE,
-        time_posted TIME,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        )''')
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS likes (
-        user_id INTEGER,
-        post_id INTEGER,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        FOREIGN KEY (post_id) REFERENCES posts(id)
-        )''')
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS follows (
-        follower_id INTEGER,
-        following_id INTEGER,
-        FOREIGN KEY (follower_id) REFERENCES users(id),
-        FOREIGN KEY (following_id) REFERENCES users(id)
-        )''')
-    conn.commit()
-    conn.close()
 
 
 def insert_users():
@@ -193,11 +151,6 @@ def insert_posts():
             "calculator", "plannerJournals", "whiteboards", "studyGuides", "ergonomicKeyboards"
         ]
     }
-        "Collectibles", "Fashion & Accessories", "Tech & Gadgets", "Books, Media & Education",
-        "Home & Furniture", "Services", "Outdoor & Sporting", "Food & Specialty",
-        "DIY & Crafting", "Miscellaneous", "Vehicles & Transportation", "Toys & Games",
-        "Music & Instruments", "Pet Supplies", "Health & Wellness", "Office & School Supplies"
-    ]
 
     goods = {
         "Collectibles": [
