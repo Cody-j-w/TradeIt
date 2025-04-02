@@ -91,7 +91,7 @@ export interface PostsTable {
     user_id: Generated<string>;
     good_id: Generated<string>;
     text: string;
-    image: string | null;
+    image: string | undefined;
     timestamp: Generated<Date>;
 }
 export interface PostLikesTable {
