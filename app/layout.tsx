@@ -1,9 +1,10 @@
-// app/layout.tsx (or app/RootLayout.tsx)
+// app/layout.tsx
+
 import NavBar from "@/components/NavBar";
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import "./global.css";
-import TradeWrapper from "@/components/TradeWrapper"; // Import TradeWrapper
+import TradeWrapper from "@/components/TradeWrapper";
 import React from "react";
 
 export const metadata: Metadata = {
