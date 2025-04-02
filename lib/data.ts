@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { db } from "./db";
 import { auth } from "@/auth";
+import { Tag } from "./definitions";
 
 export async function userInformation() {
 
@@ -112,7 +113,42 @@ export async function fetchPosts() {
     // ??? WHERE DO?
 }
 
-export async function insertPost(user: string, postText: string, good_id: string, image: string | null) {
+export async function insertPost(user: string, postText: string, goodName: string, image: string | undefined = undefined) {
+
+    const newTags = await fetchTagsFromPost(postText);
+
+    const tagInsert = await insertTags(newTags);
+
+    const postGood = await insertGood(goodName);
+
+    const newPost = await createPost(postText, user, postGood?.id!!, image);
+
+    const relations = [];
+    for (const tag of tagInsert) {
+        relations.push({ 'post_id': newPost[0].id, 'tag_id': tag.id });
+    }
+    const newPostTags = await db
+        .insertInto('posts_tags')
+        .values(relations)
+        .returning(['post_id', 'tag_id'])
+        .execute()
+}
+
+export async function createPost(text: string, user_id: string, good_id: string, image: string | undefined = undefined) {
+    const newPost = await db
+        .insertInto('posts')
+        .values({
+            text: text,
+            user_id: user_id,
+            good_id: good_id,
+            image: image
+        })
+        .returning(['id'])
+        .execute();
+    return newPost;
+}
+
+export async function fetchTagsFromPost(postText: string) {
     const tags = await db
         .selectFrom('tags')
         .select('name')
@@ -121,24 +157,20 @@ export async function insertPost(user: string, postText: string, good_id: string
     const tagNames = tags.map(tag => tag.name);
     const postTags = postText.split("#").slice(1);
     for (const tag of postTags) {
-        if (!tagNames.includes(tag)) {
-            newTags.push({ 'name': tag });
+        const sanitizedTag = tag.split(" ")[0];
+        if (!tagNames.includes(sanitizedTag)) {
+            newTags.push({ 'name': sanitizedTag });
         }
     }
 
+    return newTags;
+}
+
+export async function insertTags(tags: Tag[]) {
     const tagInsert = await db
         .insertInto('tags')
-        .values(newTags)
+        .values(tags)
         .returning(['id', 'name'])
         .execute();
-
-    const newPost = await db
-        .insertInto('posts')
-        .values({
-            text: postText,
-            user_id: user,
-            image: image
-        })
-        .returning(['id'])
-        .execute()
+    return tagInsert;
 }
