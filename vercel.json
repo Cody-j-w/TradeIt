@@ -13,7 +13,7 @@
     "routes": [
         {
             "src": "/api/py/(.*)",
-            "dest": "/api/py/$1"
+            "dest": "/api/py/index.py"
         },
         {
             "src": "/(.*)",
