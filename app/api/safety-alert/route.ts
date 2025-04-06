@@ -4,7 +4,8 @@ import twilio from "twilio";
 // Use API key SID as username, secret as password
 const client = twilio(
   process.env.TWILIO_API_KEY_SID!,
-  process.env.TWILIO_API_KEY_SECRET!
+  process.env.TWILIO_API_KEY_SECRET!,
+  { accountSid: process.env.TWILIO_ACCOUNT_SID! }
 );
 
 export async function POST(req: NextRequest) {
