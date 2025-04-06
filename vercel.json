@@ -5,8 +5,8 @@
     },
     "rewrites": [
         {
-            "src": "/api/py/(.*)",
-            "dest": "/api/py/index.py"
+            "source": "/api/py/(.*)",
+            "destination": "/api/py/index.py"
         }
     ]
 }
