@@ -1,0 +1,12 @@
+{
+    "version": 2,
+    "functions": {
+        "api/py/*.py": {}
+    },
+    "rewrites": [
+        {
+            "src": "/api/py/(.*)",
+            "dest": "/api/py/index.py"
+        }
+    ]
+}
