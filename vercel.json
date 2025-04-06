@@ -1,7 +1,10 @@
 {
     "version": 2,
     "functions": {
-        "api/py/*.py": {}
+        "api/py/*.py": {
+            "memory": 3009,
+            "maxDuration": 30
+        }
     },
     "rewrites": [
         {
