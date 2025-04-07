@@ -1,5 +1,4 @@
 // app/layout.tsx
-
 import NavBar from "@/components/NavBar";
 import { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
