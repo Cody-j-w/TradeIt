@@ -49,8 +49,6 @@ def insert_users():
 
 def insert_posts():
     """Makes post for users, ranfom tags and text for the post"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
 
     trade_tags = [
         "Collectibles", "Fashion & Accessories", "Tech & Gadgets", "Books, Media & Education",
@@ -58,99 +56,6 @@ def insert_posts():
         "DIY & Crafting", "Miscellaneous", "Vehicles & Transportation", "Toys & Games",
         "Music & Instruments", "Pet Supplies", "Health & Wellness", "Office & School Supplies"
     ]
-
-    goods = {
-        "Collectibles": [
-            "vintageVinylRecords", "rareCoinsOrCurrency", "tradingCards", "comicBooks", "stamps",
-            "antiqueJewelry", "actionFigures", "artPrintsPosters", "autographedMemorabilia", "retroToys",
-            "vintageMovieProps", "sportsCards", "historicalArtifacts", "militaryCollectibles", "signedBooks",
-            "firstEditionBooks", "oldMaps", "modelTrains", "classicBoardGames", "retroElectronics"
-        ],
-        "Fashion & Accessories": [
-            "designerHandbags", "sneakers", "vintageClothing", "watches", "sunglasses",
-            "handmadeJewelry", "customClothing", "fashionAccessories", "costumeJewelry", "leatherGoods",
-            "formalWear", "belts", "scarves", "limitedEditionShoes", "hats",
-            "backpacks", "wallets", "gothicFashion", "punkAccessories", "highEndPerfumes"
-        ],
-        "Tech & Gadgets": [
-            "usedSmartphones", "gamingConsoles", "headphones", "dslrCamerasLenses", "smartHomeDevices",
-            "videoGames", "computerParts", "laptops", "mechanicalKeyboards", "fitnessTrackers",
-            "powerTools", "graphicCards", "VRHeadsets", "drones", "smartwatches",
-            "3DPrinters", "retroGamingConsoles", "eReaders", "studioMicrophones", "projectors",
-            "customBuiltPCs", "moddedControllers", "highEndSpeakers", "tabletStands", "mechanicalNumPads"
-        ],
-        "Books, Media & Education": [
-            "books", "bluRaysDvds", "rareManuscripts", "textbooks", "mangaAnimeMerch",
-            "graphicNovels", "boardGames", "DNDMaterials", "puzzles", "artSupplies",
-            "languageTutoring", "onlineCourses", "codingLessons", "musicalInstruments", "vinylPlayers",
-            "sheetMusic", "classicLiterature", "signedNovels", "selfHelpBooks", "cookbooks",
-            "educationalKits", "tradingCardGuides", "magazines", "comicArtBooks", "scienceKits"
-        ],
-        "Home & Furniture": [
-            "smallFurniture", "houseplants", "kitchenAppliances", "homeDecor", "antiqueFurniture",
-            "handmadeRugs", "vintageLamps", "candlesIncense", "storageSolutions", "wallArt",
-            "bathroomAccessories", "bedFrames", "handmadeBlankets", "decorativePillows", "diningSets",
-            "smartLighting", "customShelves", "rockingChairs", "beanBags", "patioFurniture"
-        ],
-        "Services": [
-            "graphicDesign", "tutoring", "photographyServices", "handymanRepairs", "petSittingDogWalking",
-            "haircut", "webDesign", "customArt", "pianoLessons", "tailoring",
-            "mechanicServices", "bikeRepairs", "woodworkingCommissions", "potteryClasses", "voiceActing",
-            "digitalMarketing", "resumeWriting", "careerCoaching", "languageTranslation", "fitnessCoaching"
-        ],
-        "Outdoor & Sporting": [
-            "campingGear", "bicyclesBikeParts", "sportsEquipment", "fishingGear", "hikingGear",
-            "surfboards", "skateboards", "scooterParts", "paintballEquipment", "snowboardingGear",
-            "rockClimbingGear", "kayaks", "bmxBikes", "longboards", "airsoftGuns",
-            "huntingEquipment", "tentCampingSupplies", "archeryGear", "selfDefenseTools", "outdoorCookingSets"
-        ],
-        "Food & Specialty": [
-            "gourmetFoodItems", "bread", "freshProduce", "homemadePreserves", "bakedGoods",
-            "coffeeBeans", "artisanalCheese", "localHoney", "exoticSpices", "homemadeSweets",
-            "fermentedFoods", "rareTeaLeaves", "chocolateGiftBoxes", "premiumMeats", "veganSnacks",
-            "spicySauces", "customCakeOrders", "locallyRoastedCoffee", "pickledGoods", "foodSubscriptionBoxes"
-        ],
-        "DIY & Crafting": [
-            "craftSupplies", "perfumesColognes", "diyTools", "knittingSupplies", "sewingMachines",
-            "scrapbookingMaterials", "clayModelingKits", "embroideryKits", "customStickers", "jewelryMakingKits",
-            "handmadePaper", "candleMakingSupplies", "resinArtKits", "woodburningTools", "soapMakingKits",
-            "glassEtchingTools", "potteryWheels", "metalStampingKits", "customPins", "origamiSets"
-        ],
-        "Miscellaneous": [
-            "vintagePostcards", "tattooDesigns", "collectiblePins", "rareBoardGames", "concertMerch",
-            "horrorMemorabilia", "localArt", "recordingEquipment", "handmadeSoap", "customToys",
-            "steampunkAccessories", "fantasyMerch", "cosplayArmor", "hobbyistDrones", "paranormalEquipment",
-            "sciFiProps", "magicTricks", "tarotCards", "fortuneTellingItems", "oldArcadeMachines"
-        ],
-        "Vehicles & Transportation": [
-            "bicycleParts", "carParts", "motorcycleHelmets", "skateboardWheels", "scooters",
-            "usedBicycles", "electricSkateboards", "vintageCars", "motorcycleJackets", "customCarDecals",
-            "eBikes", "hoverboards", "classicMotorcycles", "carAudioEquipment", "offroadGear",
-            "campingTrailers", "ATVAccessories", "autoDetailingKits", "roofRacks", "truckBedCovers"
-        ],
-        "Toys & Games": [
-            "legoSets", "boardGames", "actionFigures", "stuffedAnimals", "modelKits",
-            "RCCars", "retroVideoGames", "dollHouses", "puzzles", "tabletopRPGSets",
-            "kidsToys", "collectorDolls", "gamingMiniatures", "tradingCardStorage", "arcadeMachines"
-        ],
-        "Music & Instruments": [
-            "electricGuitars", "acousticGuitars", "violins", "drumKits", "synthesizers",
-            "guitarPedals", "ukuleles", "bassGuitars", "djEquipment", "karaokeMachines",
-            "flutes", "brassInstruments", "musicRecordingSoftware", "mixingBoards", "turntables"
-        ],
-        "Pet Supplies": [
-            "dogToys", "catTrees", "birdCages", "fishTanks", "hamsterWheels",
-            "reptileTerrariums", "customPetTags", "handmadePetClothing", "petCarriers", "automaticFeeders"
-        ],
-        "Health & Wellness": [
-            "gymEquipment", "yogaMats", "essentialOils", "massageTools", "supplements",
-            "meditationAccessories", "sleepAids", "ergonomicChairs", "fitnessWearables", "weightLiftingGear"
-        ],
-        "Office & School Supplies": [
-            "officeChairs", "desks", "backpacks", "fountainPens", "notebooks",
-            "calculator", "plannerJournals", "whiteboards", "studyGuides", "ergonomicKeyboards"
-        ]
-    }
 
     goods = {
         "Collectibles": [
@@ -319,9 +224,6 @@ def insert_follows():
     conn.close()
 
 
-table_create()
-print("create function is happy")
-
 insert_users()
 print("user function is happy")
 
@@ -334,4 +236,4 @@ print("likes function is happy")
 insert_follows()
 print("follows function is happy")
 
-print("!!! everything worked !!!)")
+print("!!! everything worked !!!")
