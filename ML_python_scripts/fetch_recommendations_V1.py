@@ -101,7 +101,7 @@ def get_recommendations(user_id: int, top_k: int = 5):
             -- Ok just assume anything with images needs to be changed
             -- Because neither I nor Cody know what image storage looks like yet.
             WHERE p.id = ANY(%s)
-            GROUP BY p.id, u.id
+            GROUP BY p.id, u.id;
         """, (post_ids,))
 
         post_details = cursor.fetchall()

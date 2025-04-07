@@ -16,6 +16,9 @@ import numpy as np
 # We'll also need to pull the env variable
 # So I'm importing OS for now
 import os
+from fastapi import FastAPI
+
+app = FastAPI()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -65,6 +68,7 @@ def generate_weighted_embeddings(post):
 
     return combined
 
+@app.get("/api/py/embed")
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
     post_query = """SELECT id, text, goods.name as goods
@@ -100,6 +104,3 @@ def update_post_embeddings():
     conn.commit()
     conn.close()
     print(f"{update_count} posts updated succesfully.")
-
-if __name__ == "__main__":
-    update_post_embeddings()
