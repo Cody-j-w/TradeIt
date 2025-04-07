@@ -72,12 +72,12 @@ def generate_weighted_embeddings(post):
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
     post_query = """SELECT id, text, goods.name as goods
-                    FROM posts JOIN goods on goods.id = posts.id
+                    FROM posts JOIN goods on goods.id = posts.good_id
                     WHERE embedding IS NULL;"""
     # limit might be needed but unsure how will loop it just yet
 
     # stuff for connecting to the database here
-    conn = psycopg2.connect(os.getenv("env_var"))
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = conn.cursor
 
     cursor.execute(post_query)
