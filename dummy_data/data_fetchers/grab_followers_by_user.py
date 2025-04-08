@@ -11,7 +11,7 @@ cursor = conn.cursor()
 test_user_id = 1
 
 
-def recent_post_id(test_user_id, limit=5):
+def get_recent_followers_by_user(test_user_id, limit=5):
     cursor.execute('''
                    SELECT posts.id
                    FROM posts
@@ -25,7 +25,7 @@ def recent_post_id(test_user_id, limit=5):
     return [row[0] for row in results]
 
 
-print(recent_post_id(test_user_id))
+print(get_recent_followers_by_user(test_user_id))
 
 
 conn.close()

@@ -10,7 +10,7 @@ cursor = conn.cursor()
 zip_code = 90053
 
 
-def most_recent_post_ids_by_zip(zip_code, limit=5):
+def get_recent_posts_by_zipcode(zip_code, limit=5):
     cursor.execute('''
         SELECT posts.id
         FROM posts
@@ -24,6 +24,6 @@ def most_recent_post_ids_by_zip(zip_code, limit=5):
     return [row[0] for row in results]
 
 
-print(most_recent_post_ids_by_zip(zip_code))
+print(get_recent_posts_by_zipcode(zip_code))
 
 conn.close()
