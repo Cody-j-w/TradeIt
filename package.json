@@ -1,13 +1,14 @@
 {
 	"private": true,
 	"scripts": {
-		"fastapi-dev": "pip3 install -r requirements.txt && python3 -m uvicorn app.api.py.index:app --reload",
+		"fastapi-dev": "pip3 install -r requirements.txt && python3 -m uvicorn api.py.index:app --reload",
 		"build": "next build",
 		"next-dev": "next dev --turbo",
 		"dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
 		"start": "next start"
 	},
 	"dependencies": {
+		"@auth0/nextjs-auth0": "^4.4.1",
 		"@react-google-maps/api": "^2.20.6",
 		"@tailwindcss/forms": "0.5.10",
 		"@tailwindcss/postcss": "^4.0.9",
