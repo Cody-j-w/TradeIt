@@ -11,22 +11,21 @@ cursor = conn.cursor()
 test_user_id = 1
 
 
-def recent_post_id():
+def recent_post_id(test_user_id, limit=5):
     cursor.execute('''
                    SELECT posts.id
                    FROM posts
                    JOIN follows ON posts.user_id = follows.following_id
                    WHERE follows.follower_id = ?
                    ORDER BY posts.date_posted DESC, posts.time_posted DESC
-                   LIMIT 1;
-                   ''', (test_user_id,))
+                   LIMIT ?;
+                   ''', (test_user_id, limit))
 
-    result = cursor.fetchone()
+    results = cursor.fetchall()
+    return [row[0] for row in results]
 
-    return result[0] if result else None
 
-
-print(recent_post_id())
+print(recent_post_id(test_user_id))
 
 
 conn.close()
