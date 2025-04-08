@@ -82,9 +82,10 @@ def aggrigate_and_JSONify(post_ids):
     }
     # That will also need to be rewritten
 
-    
 
 
-@app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
-def get_recommendations(user_id):
 
+# @app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
+# def get_recommendations(user_id):
+# 
+# 
