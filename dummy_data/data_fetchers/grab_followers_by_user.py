@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Retrieve the top N recent posts from users followed by a spefific user."""
-# ! need to change connection and sqlite syntax to postgre syntax
 import psycopg2
 from typing import List, Optional
 
