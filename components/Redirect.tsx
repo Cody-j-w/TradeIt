@@ -10,7 +10,7 @@ export default function Redirect({ url }: { url: string }) {
         const session = async () => {
             const session = await getSession();
             if (session && session.user.email) {
-                userLogin(session?.user.email);
+                userLogin(session?.user.email, session.user.picture!!);
                 setAuth(true);
             }
         }
