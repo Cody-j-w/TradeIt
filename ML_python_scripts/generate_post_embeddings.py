@@ -84,6 +84,7 @@ def update_post_embeddings():
     # Will limit things when able
 
     # stuff for connecting to the database here
+
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = conn.cursor
 
@@ -111,6 +112,9 @@ def update_post_embeddings():
     conn.commit()
     conn.close()
     print(f"{update_count} posts updated succesfully.")
+
+
+<< << << << < Temporary merge branch 1
 
 
 update_post_embeddings()
