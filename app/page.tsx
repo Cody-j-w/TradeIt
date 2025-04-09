@@ -1,6 +1,7 @@
 import { auth0 } from "@/lib/auth0";
 import Image from "next/image";
 import logo from "@/public/Bee-Text.png";
+import Redirect from "@/components/Redirect";
 
 export default async function Home() {
   // Fetch the user session
@@ -32,14 +33,7 @@ export default async function Home() {
   // If session exists, show a welcome message and logout button
   return (
     <main className="flex flex-col items-center justify-center min-h-screen py-8 text-center">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {session.user.name}!</h1>
-      <p>
-        <a href="/auth/logout" className="no-underline">
-          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-            Log out
-          </button>
-        </a>
-      </p>
+      <Redirect url="/pages/home" />
     </main>
   );
 }
