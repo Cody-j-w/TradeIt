@@ -1,20 +1,19 @@
 import { sql } from "@vercel/postgres";
 import { db } from "./db";
-import { auth } from "@/auth";
 import { Tag } from "./definitions";
 
-export async function userInformation() {
+// export async function userInformation() {
 
-    const session = await auth();
-    if (session) {
-        console.log(session?.user?.id);
-        console.log(session?.user?.email);
-        return session;
-    } else {
-        console.log("please sign in");
-    }
+//     const session = await auth();
+//     if (session) {
+//         console.log(session?.user?.id);
+//         console.log(session?.user?.email);
+//         return session;
+//     } else {
+//         console.log("please sign in");
+//     }
 
-}
+// }
 
 export async function userExists(userEmail: string) {
     try {
