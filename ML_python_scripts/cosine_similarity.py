@@ -8,9 +8,9 @@
 import psycopg2
 import os
 
-def get_db_connection():
-    conn = psycopg2.connect(os.getenv("POSTGRES_URL"))
-    return conn
+# def get_db_connection():
+#     conn = psycopg2.connect(os.getenv("POSTGRES_URL"))
+#     return conn
 
 # I know that a clean programmer would put that in a utility file
 # And call it when they need it from that file
@@ -21,8 +21,7 @@ def get_db_connection():
 #   I also won't have to remember everywhere to close it
 #   So uh... stand by for details.
 
-def recommend_cosine_sim(user_id):
-    conn = get_db_connection()
+def recommend_cosine_sim(user_id, conn):
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -31,9 +30,9 @@ def recommend_cosine_sim(user_id):
         CROSS JOIN (
             SELECT AVG(embedding) AS avg_embedding
             FROM posts
-            WHERE id IN (SELECT post_id FROM likes WHERE user_id = %s)
+            WHERE id IN (SELECT post_id FROM posts_likes WHERE user_id = %s)
         ) u_average -- Average of the user embeddings (average of the things they like)
-        WHERE p.id NOT IN (SELECT post_id FROM likes WHERE user_id = %s) -- getting posts the user hasn't already liked
+        WHERE p.id NOT IN (SELECT post_id FROM posts_likes WHERE user_id = %s) -- getting posts the user hasn't already liked
             -- this is where I'd include datetime limits I think. Only recommend recent posts, you know?
         ORDER BY similarity DESC
         LIMIT 10

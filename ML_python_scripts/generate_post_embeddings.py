@@ -75,6 +75,7 @@ def update_post_embeddings():
                     FROM posts JOIN goods on goods.id = posts.good_id
                     WHERE embedding IS NULL;"""
     # limit might be needed but unsure how will loop it just yet
+    # Will limit things when able
 
     # stuff for connecting to the database here
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
