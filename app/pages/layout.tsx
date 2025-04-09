@@ -1,3 +1,4 @@
+// app/pages/layout
 import NavBar from "@/components/NavBar";
 import { Metadata } from "next";
 import TradeWrapper from "@/components/TradeWrapper";
@@ -9,17 +10,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="Bee.png" />
-      </head>
-      <body className="antialiased bg-[url('/paper.jpg')] bg-contain text-trade-gray min-h-screen">
-          <NavBar />
-          <div>
-            <main className="flex-1">{children}</main>
+    <div className="antialiased bg-[url('/paper.jpg')] bg-contain text-trade-gray min-h-screen">
+		<NavBar />
+		<div>
+            <div className="flex-1">{children}</div>
             <TradeWrapper />
-          </div>
-      </body>
-    </html>
+		</div>
+    </div>
   );
 }
