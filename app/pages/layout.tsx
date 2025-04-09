@@ -11,14 +11,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="Bee.png" />
+        <link rel="icon" href="https://djyrtfx2a7bufblj.public.blob.vercel-storage.com/images/Bee-8kFjNVeR0sgDbfMSH9Pq6kMtAh82Di.png" />
       </head>
       <body className="antialiased bg-[url('/paper.jpg')] bg-contain text-trade-gray min-h-screen">
-          <NavBar />
-          <div>
-            <main className="flex-1">{children}</main>
-            <TradeWrapper />
-          </div>
+        <NavBar />
+        <div>
+          <main className="flex-1">{children}</main>
+          <TradeWrapper />
+        </div>
       </body>
     </html>
   );
