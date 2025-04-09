@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
 """Retrieve the top N recent posts from users followed by a spefific user."""
-
-import sqlite3
+# ! need to change connection and sqlite syntax to postgre syntax
+import psycopg2
 from typing import List, Optional
 
-DB_PATH = r"C:/Users/seana/OneDrive/Documents/Learning_Playground/Time_data.db"
+DB_HOST = "example_host"
+DB_NAME = "example_name"
+DB_USER = "example_user"
+DB_PASSWORD = "example password"
 
 
-def connect_to_db(db_path: str) -> sqlite3.Connection:
-    """Establishes a connection to SQLite database."""
+def connect_to_db() -> psycopg2.extensions.connection:
+    """Establises a connection to the PostgreSQL database."""
     try:
-        return sqlite3.connect(db_path)
-    except sqlite3.Error as e:
+        connection = psycopg2.connect(
+            host=DB_HOST,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
+        )
+        return connection
+    except psycopg2.Error as e:
         raise ConnectionError(
-            f"Failed to connect to the database at {db_path}: {e}"
+            f"Failed to connect to the PostgreSQL database: {e}"
         )
 
 
-def get_recent_followers_posts(user_id: int, limit: int = 5, db_path: str = DB_PATH) -> Optional[List[int]]:
+def get_recent_followers_posts(user_id: int, limit: int = 5) -> Optional[List[int]]:
     """Fetch the most recent post IDs from the user that the given user is following"""
 
     if not isinstance(user_id, int):
@@ -26,19 +35,19 @@ def get_recent_followers_posts(user_id: int, limit: int = 5, db_path: str = DB_P
         raise ValueError("limit must be a positive integer.")
 
     try:
-        with connect_to_db(db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                           SELECT posts.id
-                           FROM posts
-                           JOIN follows ON posts.user_id = follows.following_id
-                           WHERE follows.follower_id = ?
-                           ORDER BY posts.date_posted DESC, posts.time_posted DESC
-                           LIMIT ?;
-                           ''', (user_id, limit))
-            results = cursor.fetchall()
-            return [row[0] for row in results]
+        with connect_to_db() as con:
+            with con.cursor() as cursor:
+                cursor.execute('''
+                               SELECT posts.id
+                               FROM posts
+                               JOIN followings ON posts.user_id = followings.user_id
+                               WHERE followings.user_id = %s
+                               ORDER BY posts.timestamp DESC
+                               LIMIT %s;
+                               ''', (user_id, limit))
+                results = cursor.fetchall()
+                return [row[0] for row in results]
 
-    except sqlite3.Error as e:
+    except psycopg2.Error as e:
         print(f"[ERROR] Failed to fetch posts for user_id '{user_id}': {e}")
         return None
