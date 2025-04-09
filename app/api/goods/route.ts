@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { fetchGood, fetchGoods, insertGood } from "@/lib/data";
 import { NextRequest, NextResponse } from "next/server";
 
