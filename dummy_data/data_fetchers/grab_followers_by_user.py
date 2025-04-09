@@ -13,7 +13,8 @@ def connect_to_db(db_path: str) -> sqlite3.Connection:
         return sqlite3.connect(db_path)
     except sqlite3.Error as e:
         raise ConnectionError(
-            f"Failed to connect to the database at {db_path}: {e}")
+            f"Failed to connect to the database at {db_path}: {e}"
+        )
 
 
 def get_recent_followers_posts(user_id: int, limit: int = 5, db_path: str = DB_PATH) -> Optional[List[int]]:
