@@ -26,14 +26,14 @@ export async function userExists(userEmail: string) {
     }
 }
 
-export async function userLogin(userEmail: string) {
+export async function userLogin(userEmail: string, userPicture: string) {
     const isUser = await userExists(userEmail);
     console.log(isUser);
     if (!isUser) {
         try {
             const newslug = userEmail.split("@")[0];
             const newUser =
-                await sql`INSERT INTO users (name, email, slug) VALUES (${userEmail}, ${userEmail}, ${newslug})`;
+                await sql`INSERT INTO users (name, email, slug, image) VALUES (${userEmail}, ${userEmail}, ${newslug}, ${userPicture})`;
             return newUser.rows;
         } catch (err) {
             console.error("Database Error:", err);
