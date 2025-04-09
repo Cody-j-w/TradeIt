@@ -22,15 +22,19 @@ app = FastAPI()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
+
 def pull_tags(text):
     return re.findall(r'#\w+', text)
+
 
 def clean_text(text):
     return re.sub(r'#\w+', '', text)
 
+
 def camel_case_split(str):
     return re.sub(r'([a-z])([A-Z])',
-                      r'\1 \2', str)
+                  r'\1 \2', str)
+
 
 def preprocess_tags(tags):
     if isinstance(tags, str):
@@ -39,6 +43,7 @@ def preprocess_tags(tags):
     elif isinstance(tags, list):
         return [camel_case_split(tag) for tag in tags]
     return []
+
 
 def generate_weighted_embeddings(post):
     print(f"generating embeddings for post id {post['id']}")
@@ -68,6 +73,7 @@ def generate_weighted_embeddings(post):
 
     return combined
 
+
 @app.get("/api/py/embed")
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
@@ -78,8 +84,8 @@ def update_post_embeddings():
     # Will limit things when able
 
     # stuff for connecting to the database here
-    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-    cursor = conn.cursor
+    conn = psycopg2.connect(os.getenv("env_var"))
+    cursor = conn.cursor()
 
     cursor.execute(post_query)
     posts = cursor.fetchall()
@@ -87,9 +93,9 @@ def update_post_embeddings():
     if not posts:
         print("All posts have embeddings")
         return
-    
+
     update_count = 0
-    
+
     for post in posts:
         embedding = generate_weighted_embeddings(post)
         cursor.execute("""
@@ -105,3 +111,6 @@ def update_post_embeddings():
     conn.commit()
     conn.close()
     print(f"{update_count} posts updated succesfully.")
+
+
+update_post_embeddings()
