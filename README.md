@@ -15,16 +15,16 @@ places to make trades. Join the community and start trading today!
 ## Who we are:
 
 Ace Morton: Project Manager, Machine Learning
-(github)[https://github.com/Ace-Quantum] (LinkedIn)[https://www.linkedin.com/in/ace-morton/]
+[github](https://github.com/Ace-Quantum) [LinkedIn](https://www.linkedin.com/in/ace-morton/)
 
 Clay Jones: Lead Designer, Geoloction
-(github)[https://github.com/clay-creates] , (LinkedIn)[https://www.linkedin.com/in/clay-creates/]
+[github](https://github.com/clay-creates) , [LinkedIn](https://www.linkedin.com/in/clay-creates/)
 
 Cody Walenciak: Lead Backend Developer, Database management, Integration
-(github)[https://github.com/Cody-j-w] , (LinkedIn)[https://www.linkedin.com/in/cody-walenciak/]
+[github](https://github.com/Cody-j-w) , [LinkedIn](https://www.linkedin.com/in/cody-walenciak/)
 
 Mike Bilbee: Lead Frontend developer, Design
-(github)[https://github.com/MikeBilbee] , (LinkedIn)[https://www.linkedin.com/in/mikebilbee/]
+[github](https://github.com/MikeBilbee) , [LinkedIn](https://www.linkedin.com/in/mikebilbee/)
 
 Sean Montgomery: Machine Learning, Finances
-(github)[https://github.com/iamseaniam] , (LinkedIn)[https://www.linkedin.com/in/sean-montgomery613/]
+[github](https://github.com/iamseaniam) , [LinkedIn](https://www.linkedin.com/in/sean-montgomery613/)

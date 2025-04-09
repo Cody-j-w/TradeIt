@@ -16,6 +16,9 @@ import numpy as np
 # We'll also need to pull the env variable
 # So I'm importing OS for now
 import os
+from fastapi import FastAPI
+
+app = FastAPI()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -71,16 +74,18 @@ def generate_weighted_embeddings(post):
     return combined
 
 
+@app.get("/api/py/embed")
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
     post_query = """SELECT id, text, goods.name as goods
-                    FROM posts JOIN goods on goods.id = posts.id
-                    WHERE embedding IS NULL 
-                    LIMIT 1000;"""
+                    FROM posts JOIN goods on goods.id = posts.good_id
+                    WHERE embedding IS NULL;"""
+    # limit might be needed but unsure how will loop it just yet
+    # Will limit things when able
 
     # stuff for connecting to the database here
-    conn = psycopg2.connect(os.getenv("env_var"))
-    cursor = conn.cursor()
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cursor = conn.cursor
 
     cursor.execute(post_query)
     posts = cursor.fetchall()
