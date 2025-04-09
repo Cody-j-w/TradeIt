@@ -1,45 +1,45 @@
-// app/page.tsx
-'use client'
+import { auth0 } from "@/lib/auth0";
+import Image from "next/image";
+import logo from "@/public/Bee-Text.png";
 
-import { useState } from 'react';
+export default async function Home() {
+  // Fetch the user session
+  const session = await auth0.getSession();
 
-const Home = () => {
-  const [activeTab, setActiveTab] = useState('Following');
+  // If no session, show sign-up and login buttons
+  if (!session) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen py-8">
+        <div className="mb-8">
+          <Image src={logo} alt="Your Logo" width={390} height={200} />
+        </div>
+        <div className="flex gap-4">
+          <a href="/auth/login?screen_hint=signup" className="no-underline">
+            <button className="bg-trade-white text-trade-gray  font-semibold py-2 px-4 rounded shadow-md">
+              Sign up
+            </button>
+          </a>
+          <a href="/auth/login" className="no-underline">
+            <button className="bg-trade-green text-trade-white shadow-md font-bold py-2 px-4 rounded">
+              Log in
+            </button>
+          </a>
+        </div>
+      </main>
+    );
+  }
 
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
-  };
-
+  // If session exists, show a welcome message and logout button
   return (
-    <div>
-      <div className="flex justify-center bg-gray-300 text-trade-gray">
-        <button
-          className={`px-4 py-2 ${activeTab === 'Following' ? 'border-b-2 border-trade-blue' : ''}`}
-          onClick={() => handleTabClick('Following')}
-        >
-          Following
-        </button>
-        <button
-          className={`px-4 py-2 ${activeTab === 'Suggested' ? 'border-b-2 border-trade-blue' : ''}`}
-          onClick={() => handleTabClick('Suggested')}
-        >
-          Suggested
-        </button>
-        <button
-          className={`px-4 py-2 ${activeTab === 'Near You' ? 'border-b-2 border-trade-blue' : ''}`}
-          onClick={() => handleTabClick('Near You')}
-        >
-          Near You
-        </button>
-      </div>
-
-      <div className="p-4">
-        {activeTab === 'Following' && <div>Following content goes here.</div>}
-        {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
-        {activeTab === 'Near You' && <div>Near You content goes here.</div>}
-      </div>
-    </div>
+    <main className="flex flex-col items-center justify-center min-h-screen py-8 text-center">
+      <h1 className="text-2xl font-bold mb-4">Welcome, {session.user.name}!</h1>
+      <p>
+        <a href="/auth/logout" className="no-underline">
+          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            Log out
+          </button>
+        </a>
+      </p>
+    </main>
   );
-};
-
-export default Home;
+}

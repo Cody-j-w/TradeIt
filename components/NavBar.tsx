@@ -17,7 +17,7 @@ const NavBar: React.FC = () => {
   return (
     <aside className="bg-trade-green fixed bottom-0 left-0 w-full pb-6">
       <nav className="flex justify-around p-4">
-        <Link href="/">
+        <Link href="/pages/home">
           <Image
             src={home}
             alt="Home"
@@ -27,7 +27,7 @@ const NavBar: React.FC = () => {
             style={{ opacity: pathname === "/" ? 1 : 0.6 }}
           />
         </Link>
-        <Link href="/feed">
+        <Link href="/pages/feed">
           <Image
             src={feed}
             alt="Feed"
@@ -37,7 +37,7 @@ const NavBar: React.FC = () => {
             style={{ opacity: pathname === "/feed" ? 1 : 0.6 }}
           />
         </Link>
-        <Link href="/search">
+        <Link href="/pages/search">
           <Image
             src={search}
             alt="Search"
@@ -47,7 +47,7 @@ const NavBar: React.FC = () => {
             style={{ opacity: pathname === "/search" ? 1 : 0.6 }}
           />
         </Link>
-        <Link href="/profile">
+        <Link href="/pages/profile">
           <Image
             src={profile}
             alt="Profile"
@@ -57,7 +57,7 @@ const NavBar: React.FC = () => {
             style={{ opacity: pathname === "/profile" ? 1 : 0.6 }}
           />
         </Link>
-        <Link href="/activity">
+        <Link href="/pages/activity">
           <Image
             src={notifs}
             alt="Notifications"
