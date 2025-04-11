@@ -21,8 +21,8 @@ const NavBar: React.FC = () => {
           <Image
             src={home}
             alt="Home"
-            width={24}
-            height={24}
+            width={32}
+            height={32}
             className="fill-current"
             style={{ opacity: pathname === "/pages/home" ? 1 : 0.6 }}
           />
@@ -31,8 +31,8 @@ const NavBar: React.FC = () => {
           <Image
             src={feed}
             alt="Feed"
-            width={24}
-            height={24}
+            width={32}
+            height={32}
             className="fill-current"
             style={{ opacity: pathname === "/pages/feed" ? 1 : 0.6 }}
           />
@@ -41,8 +41,8 @@ const NavBar: React.FC = () => {
           <Image
             src={search}
             alt="Search"
-            width={24}
-            height={24}
+            width={32}
+            height={32}
             className="fill-current"
             style={{ opacity: pathname === "/pages/search" ? 1 : 0.6 }}
           />
@@ -51,8 +51,8 @@ const NavBar: React.FC = () => {
           <Image
             src={profile}
             alt="Profile"
-            width={24}
-            height={24}
+            width={36}
+            height={36}
             className="fill-current"
             style={{ opacity: pathname === "/pages/profile" ? 1 : 0.6 }}
           />
@@ -63,7 +63,7 @@ const NavBar: React.FC = () => {
             alt="Notifications"
             width={24}
             height={24}
-            className="fill-current"
+            className="fill-current translate-y-[8px]"
             style={{ opacity: pathname === "/pages/activity" ? 1 : 0.6 }}
           />
         </Link>
