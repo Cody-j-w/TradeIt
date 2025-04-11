@@ -11,7 +11,7 @@ export default function Redirect({ url }: { url: string }) {
             console.log(session !== null);
             console.log(session?.user.email !== null)
             if (session !== null && session.user.email !== null) {
-                // await login(session?.user.email, session.user.picture!!);
+                await login(session?.user.email!!, session.user.picture!!);
                 redirect(url);
             } else {
                 redirect("/");
