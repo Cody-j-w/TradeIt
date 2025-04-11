@@ -58,7 +58,7 @@ export async function getSingleUser(userEmail: string) {
     if (isUser) {
         const fetchedUser = await db
             .selectFrom("users")
-            .select(['name', 'image', 'slug'])
+            .select(['id', 'name', 'image', 'slug'])
             .where('email', '=', userEmail)
             .execute();
         return fetchedUser[0];
