@@ -11,12 +11,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="Bee.png" />
+        <link rel="icon" href="https://djyrtfx2a7bufblj.public.blob.vercel-storage.com/images/Bee-8kFjNVeR0sgDbfMSH9Pq6kMtAh82Di.png" />
       </head>
       <body className="antialiased bg-trade-gray bg-contain text-trade-orange h-screen">
-          <div>
-            <main className="flex-1">{children}</main>
-          </div>
+        <div>
+          <main className="flex-1">{children}</main>
+        </div>
       </body>
     </html>
   );
