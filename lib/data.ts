@@ -192,13 +192,13 @@ export async function fetchFollows() {
     const followedUsers = await db
         .selectFrom("users")
         .innerJoin("followings as f", "f.user_id", "users.id")
-        .select(["id", "bio", "name", "image"])
+        .select(["users.id", "bio", "name", "image"])
         .where("f.follower_id", "=", fid)
         .execute()
     return followedUsers;
 }
 
-export async function addFollow(userId: string) {
+export async function addFollow(userId: string,) {
     const follower = await getSelf();
     const fid = follower.id;
     const newFollow = await db
