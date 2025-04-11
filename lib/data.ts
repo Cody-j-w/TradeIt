@@ -53,7 +53,7 @@ export async function userLogin(userEmail: string, userPicture: string) {
     }
 }
 
-export async function getUser(userEmail: string) {
+export async function getSingleUser(userEmail: string) {
     const isUser = await userExists(userEmail);
     if (isUser) {
         const fetchedUser = await db
@@ -63,6 +63,14 @@ export async function getUser(userEmail: string) {
             .execute();
         return fetchedUser[0];
     }
+}
+
+export async function getUsers() {
+    const users = await db
+        .selectFrom("users")
+        .select(['id', 'name', 'image', 'slug'])
+        .execute();
+    return users;
 }
 
 export async function fetchGood(goodName: string) {
