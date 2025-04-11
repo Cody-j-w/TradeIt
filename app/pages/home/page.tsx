@@ -2,6 +2,7 @@
 'use client'
 
 import { useState } from 'react';
+import TradeSpotsMap from '@/components/TradeSpotsMap';
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState('Following');
@@ -36,7 +37,7 @@ const Home = () => {
       <div className="p-4">
         {activeTab === 'Following' && <div>Following content goes here.</div>}
         {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
-        {activeTab === 'Near You' && <div>Near You content goes here.</div>}
+        {activeTab === 'Near You' && <TradeSpotsMap />}
       </div>
     </div>
   );
