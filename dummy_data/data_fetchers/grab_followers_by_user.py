@@ -46,7 +46,8 @@ def get_recent_followers_posts(user_id: int, limit: int = 5) -> Optional[List[in
                                LIMIT %s;
                                ''', (user_id, limit))
                 results = cursor.fetchall()
-                return [row[0] for row in results]
+                user_ids = [row[0] for row in results]
+                return user_ids
 
     except psycopg2.Error as e:
         print(f"[ERROR] Failed to fetch posts for user_id '{user_id}': {e}")

@@ -45,7 +45,9 @@ def get_recent_posts_by_liked_profiles(user_id: int, limit: int = 5) -> Optional
                                LIMIT %s
                                ''', (user_id, limit))
                 results = cursor.fetchall()
-                return results
+                user_ids = [row[1] for row in results]
+                return user_ids
+
     except psycopg2.Error as e:
         print(f"[ERROR] Failed to fetch posts for user_id '{user_id}': {e}")
         return None
