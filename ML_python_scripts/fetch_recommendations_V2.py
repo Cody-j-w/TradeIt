@@ -61,8 +61,6 @@ def aggrigate_and_JSONify(post_ids, conn):
 
     post_details = cursor.fetchall()
 
-    conn.close()
-
     # Not sure if there needs to be a change in how row[0] works
     # Just because it feels weird that it's not got a name.
 
@@ -122,5 +120,7 @@ def get_recommendations(user_id):
     # and append them to a list
 
     populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
+
+    conn.close()
 
     return populated_post_recs
