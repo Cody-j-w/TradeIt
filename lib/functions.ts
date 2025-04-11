@@ -1,7 +1,7 @@
 // lib/functions
 "use server";
 import { auth0 } from "./auth0";
-import { getSelf, insertPost, userLogin } from "./data";
+import { getSelf, getSingleUser, getUsers, insertPost, userLogin } from "./data";
 import { put } from '@vercel/blob';
 
 export async function getSession() {
@@ -29,4 +29,14 @@ export async function imageUpload(image: File) {
         addRandomSuffix: true
     });
     return blob;
+}
+
+export async function getUser(userEmail: string) {
+    const user = await getSingleUser(userEmail);
+    return user;
+}
+
+export async function getAllUsers() {
+    const users = await getUsers();
+    return users;
 }
