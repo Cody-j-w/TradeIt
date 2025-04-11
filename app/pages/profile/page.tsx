@@ -1,23 +1,24 @@
-// app/profile
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
+import { getUser } from '@/lib/functions';
 
 // Placeholder for profile picture
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
 import PencilIcon from '@/assets/pencil.png';
 
 interface User {
-  id: string; // Or the actual ID type from your database
-  username: string;
-  userurl: string;
-  // ... other user properties
+  id: string;
+  name: string;
+  image: string;
+  slug: string;
+  // ... other user properties that *actually* exist in the database response
 }
 
-const ProfilePage = () => {
+const Profile = () => {
   const router = useRouter();
   const { user: auth0User, isLoading, error } = useUser();
   const [activeTab, setActiveTab] = useState('Posts');
@@ -30,21 +31,24 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        if (auth0User?.sub) {
-          const response = await fetch(`/api/users`); // Changed endpoint name
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        if (auth0User?.email) {
+          const fetchedUser = await getUser(auth0User.email);
+          console.log("Fetched User:", fetchedUser);
+          if (fetchedUser) {
+            setUser(fetchedUser); // Only set if not null
+          } else {
+            setUser(null); // Explicitly set to null if necessary
           }
-          const fetchedUser = await response.json();
-          setUser(fetchedUser);
         }
       } catch (error: any) {
         console.error('Error fetching user data:', error);
+        setUser(null); // Handle error case, ensure null is set
       }
     };
 
     fetchUserData();
-  }, [auth0User?.sub]);
+  }, [auth0User?.email]);
+
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -61,17 +65,21 @@ const ProfilePage = () => {
   const handleSaveDescription = async () => {
     setIsEditingDescription(false);
     try {
-      if (auth0User?.sub && user?.id) {
-        const response = await fetch('/api/profile', { // Changed endpoint name
+      if (user?.id) {
+        // Assuming you have a server action to update the description
+        // You'll need to create this server action if it doesn't exist.
+        const response = await fetch('/api/update-description-server', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ description }), // Only send description
+          body: JSON.stringify({ userId: user.id, description }),
         });
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         console.log('Description saved:', description);
       }
     } catch (error: any) {
@@ -135,8 +143,8 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">{user.username}</h2>
-              <p className="text-sm text-gray-500">{user.userurl}</p>
+              <h2 className="text-lg font-semibold">{user.name}</h2>
+              <p className="text-sm text-gray-500">{user.slug}</p>
             </div>
           </div>
         </div>
@@ -203,4 +211,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default Profile;

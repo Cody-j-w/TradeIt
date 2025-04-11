@@ -32,8 +32,17 @@ export async function imageUpload(image: File) {
 }
 
 export async function getUser(userEmail: string) {
-    const user = await getSingleUser(userEmail);
-    return user;
+    try {
+        const user = await getSingleUser(userEmail);
+        if (user) {
+            return user;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return null;
+    }
 }
 
 export async function getAllUsers() {
