@@ -1,25 +1,23 @@
 "use client";
 import { userLogin } from "@/lib/data";
-import { getSession } from "@/lib/functions";
+import { getSession, login } from "@/lib/functions";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Redirect({ url }: { url: string }) {
-    const [auth, setAuth] = useState(false);
     useEffect(() => {
         const session = async () => {
             const session = await getSession();
-            if (session && session.user.email) {
-                userLogin(session?.user.email);
-                setAuth(true);
+            console.log(session !== null);
+            console.log(session?.user.email !== null)
+            if (session !== null && session.user.email !== null) {
+                // await login(session?.user.email, session.user.picture!!);
+                redirect(url);
+            } else {
+                redirect("/");
             }
         }
         session();
-        if (auth === true) {
-            redirect(url);
-        } else {
-            redirect("/");
-        }
     }, []);
     return (
         <div className="redirecting">
