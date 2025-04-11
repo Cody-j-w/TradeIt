@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation"; // Import usePathname
+import { usePathname } from "next/navigation";
 
 import home from "@/assets/home.svg";
 import feed from "@/assets/feed.svg";
@@ -12,7 +12,7 @@ import profile from "@/assets/profile.svg";
 import notifs from "@/assets/notifications.svg";
 
 const NavBar: React.FC = () => {
-  const pathname = usePathname(); // Get the current pathname using usePathname
+  const pathname = usePathname();
 
   return (
     <aside className="bg-trade-green fixed bottom-0 left-0 w-full pb-6">
@@ -24,7 +24,7 @@ const NavBar: React.FC = () => {
             width={24}
             height={24}
             className="fill-current"
-            style={{ opacity: pathname === "/" ? 1 : 0.6 }}
+            style={{ opacity: pathname === "/pages/home" ? 1 : 0.6 }}
           />
         </Link>
         <Link href="/pages/feed">
@@ -34,7 +34,7 @@ const NavBar: React.FC = () => {
             width={24}
             height={24}
             className="fill-current"
-            style={{ opacity: pathname === "/feed" ? 1 : 0.6 }}
+            style={{ opacity: pathname === "/pages/feed" ? 1 : 0.6 }}
           />
         </Link>
         <Link href="/pages/search">
@@ -44,7 +44,7 @@ const NavBar: React.FC = () => {
             width={24}
             height={24}
             className="fill-current"
-            style={{ opacity: pathname === "/search" ? 1 : 0.6 }}
+            style={{ opacity: pathname === "/pages/search" ? 1 : 0.6 }}
           />
         </Link>
         <Link href="/pages/profile">
@@ -54,7 +54,7 @@ const NavBar: React.FC = () => {
             width={24}
             height={24}
             className="fill-current"
-            style={{ opacity: pathname === "/profile" ? 1 : 0.6 }}
+            style={{ opacity: pathname === "/pages/profile" ? 1 : 0.6 }}
           />
         </Link>
         <Link href="/pages/activity">
@@ -64,7 +64,7 @@ const NavBar: React.FC = () => {
             width={24}
             height={24}
             className="fill-current"
-            style={{ opacity: pathname === "/activity" ? 1 : 0.6 }}
+            style={{ opacity: pathname === "/pages/activity" ? 1 : 0.6 }}
           />
         </Link>
       </nav>
