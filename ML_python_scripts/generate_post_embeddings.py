@@ -25,7 +25,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-# model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('paraphrase-albert-small-v2')
 load_dotenv()
 
 
