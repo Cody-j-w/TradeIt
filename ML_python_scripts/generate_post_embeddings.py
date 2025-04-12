@@ -99,7 +99,7 @@ def update_post_embeddings():
     print("Data Connection Info:")
     print(os.getenv("DATABASE_URL"))
 
-    cursor = conn.cursor
+    cursor = conn.cursor()
 
     cursor.execute(post_query)
     posts = cursor.fetchall()
