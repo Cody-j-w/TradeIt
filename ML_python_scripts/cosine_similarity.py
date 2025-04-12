@@ -22,6 +22,9 @@ import os
 #   So uh... stand by for details.
 
 def recommend_cosine_sim(user_id, conn):
+    # ACE
+    # MAKE SURE YOU ONLY PULL POSTS WITH EMBEDDINGS
+    # OTHERWISE THINGS MAY BREAK
     cursor = conn.cursor()
 
     cursor.execute("""

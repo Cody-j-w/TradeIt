@@ -10,15 +10,18 @@ from sentence_transformers import SentenceTransformer
 # I imagine that since this'll be running on cody's machine
 # I won't need to have this downloaded.
 # Jury's out though
+#   I am in fact downloading this as I am testing it on my own machine
+#   Also, past Ace, it wasn't that big of a deal.
+#   Don't be a baby next time
 import psycopg2
 import re
 import numpy as np
 # We'll also need to pull the env variable
 # So I'm importing OS for now
 import os
-from fastapi import FastAPI
+# from fastapi import FastAPI
 
-app = FastAPI()
+# app = FastAPI()
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -74,7 +77,9 @@ def generate_weighted_embeddings(post):
     return combined
 
 
-@app.get("/api/py/embed")
+# @app.get("/api/py/embed")
+# Do I need these if the API calls happen somewhere else???
+# Is it that easy???????
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
     post_query = """SELECT id, text, goods.name as goods
@@ -112,5 +117,3 @@ def update_post_embeddings():
     conn.commit()
     conn.close()
     print(f"{update_count} posts updated succesfully.")
-
-update_post_embeddings()

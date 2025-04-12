@@ -20,7 +20,8 @@ def hello_fast_api():
 #   Now's not the time to make jokes about that.
 @app.get("/api/py/embed")
 def update_post_embeddings():
-    update_post_embeddings()
+    return {"message": "Congrats! The call made it through!"}
+    # update_post_embeddings()
 
 
 # I genuinely have no idea what I'm doing but I think it is that simple.
