@@ -5,7 +5,7 @@
 # Anyway here's some imports
 
 # import psycopg2.pool
-# from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 # import json
 
 # I imagine that since this'll be running on cody's machine
