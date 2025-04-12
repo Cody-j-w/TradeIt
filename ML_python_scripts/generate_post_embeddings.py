@@ -5,7 +5,7 @@
 # Anyway here's some imports
 
 # import psycopg2.pool
-# from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 # import json
 
 # I imagine that since this'll be running on cody's machine
@@ -14,129 +14,117 @@
 #   I am in fact downloading this as I am testing it on my own machine
 #   Also, past Ace, it wasn't that big of a deal.
 #   Don't be a baby next time
-# import psycopg2
+import psycopg2
 import re
 import numpy as np
 # We'll also need to pull the env variable
 # So I'm importing OS for now
 import os
 from dotenv.main import load_dotenv
-# from fastapi import FastAPI
+from fastapi import FastAPI
 
-# app = FastAPI()
+app = FastAPI()
 
-# model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('all-MiniLM-L6-v2')
 load_dotenv()
 
 
-# def pull_tags(text):
-#     return re.findall(r'#\w+', text)
+def pull_tags(text):
+    return re.findall(r'#\w+', text)
 
 
-# def clean_text(text):
-#     return re.sub(r'#\w+', '', text)
+def clean_text(text):
+    return re.sub(r'#\w+', '', text)
 
 
-# def camel_case_split(str):
-#     return re.sub(r'([a-z])([A-Z])',
-#                   r'\1 \2', str)
+def camel_case_split(str):
+    return re.sub(r'([a-z])([A-Z])',
+                  r'\1 \2', str)
 
 
-# def preprocess_tags(tags):
-#     if isinstance(tags, str):
-#         tags = camel_case_split(tags)
-#         return [tag.strip() for tag in tags.split(',') if tag.strip()]
-#     elif isinstance(tags, list):
-#         return [camel_case_split(tag) for tag in tags]
-#     return []
+def preprocess_tags(tags):
+    if isinstance(tags, str):
+        tags = camel_case_split(tags)
+        return [tag.strip() for tag in tags.split(',') if tag.strip()]
+    elif isinstance(tags, list):
+        return [camel_case_split(tag) for tag in tags]
+    return []
 
 
-# def generate_weighted_embeddings(post):
-#     print(f"generating embeddings for post id {post['id']}")
+def generate_weighted_embeddings(post):
+    print(f"generating embeddings for post id {post['id']}")
 
-#     tags = pull_tags(post['text'])
-#     tags = preprocess_tags(tags)
-#     print(f"tags pulled: {tags}")
+    tags = pull_tags(post['text'])
+    tags = preprocess_tags(tags)
+    print(f"tags pulled: {tags}")
 
-#     text = clean_text(post['text'])
-#     print(f"text pulled: {text}")
+    text = clean_text(post['text'])
+    print(f"text pulled: {text}")
 
-#     goods = post['goods']
-#     print(f"goods pulled: {goods}")
+    goods = post['goods']
+    print(f"goods pulled: {goods}")
 
-#     tag_embedding = model.encode(" ".join(tags)) if tags else np.zeros(384)
-#     goods_embedding = model.encode(goods) * 2
-#     # *2 so we put more weight on the goods that the user wants
-#     # This can be changed later, hyperparameter tuning is vibes based
-#     text_embedding = model.encode(text) if text else np.zeros(384)
+    tag_embedding = model.encode(" ".join(tags)) if tags else np.zeros(384)
+    goods_embedding = model.encode(goods) * 2
+    # *2 so we put more weight on the goods that the user wants
+    # This can be changed later, hyperparameter tuning is vibes based
+    text_embedding = model.encode(text) if text else np.zeros(384)
 
-#     combined = np.concatenate([
-#         tag_embedding,
-#         goods_embedding,
-#         text_embedding * 0.3
-#         # more vibes based hyperparameter tuning
-#     ])
+    combined = np.concatenate([
+        tag_embedding,
+        goods_embedding,
+        text_embedding * 0.3
+        # more vibes based hyperparameter tuning
+    ])
 
-#     return combined
+    return combined
 
 
-# @app.get("/api/py/embed")
+@app.get("/api/py/embed")
 # Do I need these if the API calls happen somewhere else???
 # Is it that easy???????
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
-    # post_query = """SELECT id, text, goods.name as goods
-    #                 FROM posts JOIN goods on goods.id = posts.good_id
-    #                 WHERE embedding IS NULL;"""
+    post_query = """SELECT id, text, goods.name as goods
+                    FROM posts JOIN goods on goods.id = posts.good_id
+                    WHERE embedding IS NULL;"""
     # limit might be needed but unsure how will loop it just yet
     # Will limit things when able
 
     # stuff for connecting to the database here
 
-    connection_string = os.getenv('DATABASE_URL')
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
 
-    # Idk if I even need a pool I'm just following a guide.
-    # connection_pool = psycopg2.pool.SimpleConnectionPool(
-    #     1,
-    #     10,
-    #     connection_string
-    # )
-
-    # if connection_pool:
-    #     print("pool created successfully")
-
-    # conn = connection_pool.getconn()
 
     print("Data Connection Info:")
-    # print(os.getenv("DATABASE_URL"))
-    print(connection_string)
+    print(os.getenv("DATABASE_URL"))
 
-    # cursor = conn.cursor
+    cursor = conn.cursor
 
-    # cursor.execute(post_query)
-    # posts = cursor.fetchall()
+    cursor.execute(post_query)
+    posts = cursor.fetchall()
 
-    # if not posts:
-    #     print("All posts have embeddings")
-    #     return
+    if not posts:
+        print("All posts have embeddings")
+        return
 
-    # update_count = 0
+    update_count = 0
 
-    # for post in posts:
-    #     embedding = generate_weighted_embeddings(post)
-    #     cursor.execute("""
-    #         UPDATE posts
-    #         SET embedding = %s
-    #         WHERE id = %s;
-    #     """, (embedding.tolist(), post['id']))
-    #     # Not sure if it needs to be tolist()
-    #     # Since the datatype is a vector.
+    for post in posts:
+        embedding = generate_weighted_embeddings(post)
+        cursor.execute("""
+            UPDATE posts
+            SET embedding = %s
+            WHERE id = %s;
+        """, (embedding.tolist(), post['id']))
+        # Not sure if it needs to be tolist()
+        # Since the datatype is a vector.
 
-    #     update_count += 1
+        update_count += 1
 
-    # conn.commit()
-    # conn.close()
-    # print(f"{update_count} posts updated succesfully.")
+    conn.commit()
+    conn.close()
+    print(f"{update_count} posts updated succesfully.")
 
 if __name__ == "__main__":
     update_post_embeddings()
