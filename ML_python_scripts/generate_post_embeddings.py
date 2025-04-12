@@ -85,7 +85,7 @@ def generate_weighted_embeddings(post):
 # Is it that easy???????
 def update_post_embeddings():
     # This will need some error handling but for now I think it's ok
-    post_query = """SELECT id, text, goods.name as goods
+    post_query = """SELECT posts.id, text, goods.name as goods
                     FROM posts JOIN goods on goods.id = posts.good_id
                     WHERE embedding IS NULL;"""
     # limit might be needed but unsure how will loop it just yet
