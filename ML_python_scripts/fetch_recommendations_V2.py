@@ -103,7 +103,11 @@ def aggrigate_and_JSONify(post_ids, conn):
 
 
 
-@app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
+# @app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
+# I genuinely do NOT understand this.
+# How have I been so stupid for this long?
+# Or rather, how have I been over thinking this for this long?
+# Need me some brain smoother.
 def get_recommendations(user_id):
     conn = get_db_connection()
     # cursor = conn.cursor()

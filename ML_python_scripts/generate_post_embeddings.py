@@ -112,4 +112,5 @@ def update_post_embeddings():
     conn.commit()
     conn.close()
     print(f"{update_count} posts updated succesfully.")
+
 update_post_embeddings()
