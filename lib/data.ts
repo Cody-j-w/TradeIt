@@ -20,7 +20,7 @@ export async function getSelf() {
     const session = await auth0.getSession();
     const self = await db
         .selectFrom("users")
-        .select(["id", "email", "image", "slug"])
+        .select(["id", "name", "image", "slug"])
         .where("email", "=", session?.user.email!!)
         .execute()
     return self[0];
@@ -260,4 +260,39 @@ export async function addFollow(userId: string,) {
         })
         .executeTakeFirst();
     return newFollow;
+}
+
+export async function fetchFollowers() {
+    const me = await getSelf();
+    const followers = await db
+        .selectFrom("users")
+        .innerJoin("followings", "follower_id", "users.id")
+        .select(["users.id", "users.name", "users.image"])
+        .where("followings.user_id", "=", me.id)
+        .execute();
+    return followers;
+}
+
+export async function updateUsername(name: string) {
+    const me = await getSelf();
+    const newUsername = await db
+        .updateTable("users")
+        .set({
+            name: name
+        })
+        .where('id', '=', me.id)
+        .executeTakeFirst();
+    return newUsername;
+}
+
+export async function updateAvatar(image: string) {
+    const me = await getSelf();
+    const newAvatar = await db
+        .updateTable("users")
+        .set({
+            image: image
+        })
+        .where('id', '=', me.id)
+        .executeTakeFirst();
+    return newAvatar;
 }
