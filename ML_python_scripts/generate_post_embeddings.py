@@ -111,12 +111,24 @@ def update_post_embeddings():
     update_count = 0
 
     for post in posts:
-        embedding = generate_weighted_embeddings(post)
+        print(f"Data Type: {type(post)}")
+        print(f"Post info: {post}")
+        post = list(post)
+        print(f"List Data Type: {type(post)}")
+        print(f"List Post info: {post}")
+    
+        post_dict = {
+            "id": post[0],
+            "text": post[1],
+            "goods": post[2]
+        }
+
+        embedding = generate_weighted_embeddings(post_dict)
         cursor.execute("""
             UPDATE posts
             SET embedding = %s
             WHERE id = %s;
-        """, (embedding.tolist(), post['id']))
+        """, (embedding.tolist(), post_dict["id"]))
         # Not sure if it needs to be tolist()
         # Since the datatype is a vector.
 
