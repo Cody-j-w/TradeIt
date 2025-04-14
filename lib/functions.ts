@@ -1,7 +1,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { fetchFollowedPosts, fetchFollows, getSelf, getSingleUser, getUsers, insertGood, insertPost, updateAvatar, updateUsername, userLogin } from "./data";
+import { addFollow, fetchFollowedPosts, fetchFollows, getSelf, getSingleUser, getUsers, insertGood, insertPost, updateAvatar, updateBio, updateUsername, userLogin } from "./data";
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -73,8 +73,14 @@ export async function getFollowedUsers() {
     }
 }
 
-export async function addFollow() {
-
+export async function submitFollow(data: FormData) {
+    const followedUser = await data.get("user_id")?.toString();
+    if (followedUser) {
+        const newFollow = await addFollow(followedUser)
+        return newFollow;
+    } else {
+        return null;
+    }
 }
 
 export async function getFollowers() {
@@ -93,9 +99,17 @@ export async function submitAvatar(data: FormData) {
 }
 
 export async function submitUsername(data: FormData) {
-    const input = data.get("input")?.toString();
+    const input = data.get("username")?.toString();
     if (input && input.length > 0) {
         await updateUsername(input);
+        revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
+    }
+}
+
+export async function submitBio(data: FormData) {
+    const input = data.get("bio")?.toString();
+    if (input) {
+        await updateBio(input);
         revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
     }
 }
