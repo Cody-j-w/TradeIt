@@ -106,6 +106,33 @@ export async function insertGood(goodName: string) {
     }
 }
 
+export async function createTrader(userId: string, goodId: string) {
+    const newTrader = await db
+        .insertInto("traders")
+        .values({
+            user: userId,
+            good: goodId,
+            timestamp: new Date()
+        })
+        .returning(['id', 'user', 'good'])
+        .execute();
+    return newTrader;
+}
+
+export async function createTrade(traderOne: string, traderTwo: string, location: string) {
+    const newTrade = await db
+        .insertInto("trades")
+        .values({
+            trader_a: traderOne,
+            trader_b: traderTwo,
+            location_id: location,
+            timestamp: new Date()
+        })
+        .returning(['trader_a', 'trader_b', 'location_id', 'timestamp'])
+        .execute();
+    return newTrade;
+}
+
 export async function fetchLocation(locationAddress: string) {
     const fetchedLocation = await db
         .selectFrom('locations')
@@ -204,6 +231,21 @@ export async function fetchFollows() {
         .where("f.follower_id", "=", fid)
         .execute()
     return followedUsers;
+}
+
+export async function fetchFollowedPosts() {
+    const followedUsers = await fetchFollows();
+    const fids = [];
+    for (const user of followedUsers) {
+        fids.push(user.id);
+    }
+    const followedPosts = await db
+        .selectFrom("posts")
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(["text", "timestamp", "image", "goods.name"])
+        .where("posts.id", "in", fids)
+        .execute()
+    return followedPosts;
 }
 
 export async function addFollow(userId: string,) {

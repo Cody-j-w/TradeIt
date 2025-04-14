@@ -54,7 +54,6 @@ export interface TradesTable {
     trader_a: Generated<string>;
     trader_b: Generated<string>;
     location_id: Generated<string>;
-    like: boolean;
     timestamp: Date;
 }
 
