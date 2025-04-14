@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import TradeButton from '@/components/TradeButton';
+import AddNewButton from '@/components/AddNewButton';
 import TradeModal from '@/components/TradeModal';
 
 interface User {
@@ -51,7 +51,13 @@ const TradeWrapper: React.FC = () => {
   return (
     <>
       {/* Trade Button (Floating) */}
-      {!isTradeModalOpen && <TradeButton onOpen={openTradeModal} />}
+	  {!isTradeModalOpen && (
+        <AddNewButton
+          onOpenPostModal={() => console.log('Open Post Modal')}
+          onOpenBlogModal={() => console.log('Open Blog Modal')}
+          onOpenTradeModal={openTradeModal}
+        />
+      )}
 
       {/* Conditionally render TradeModal */}
       {isTradeModalOpen && (

@@ -1,3 +1,4 @@
+// lib/functions
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
@@ -38,10 +39,15 @@ export async function imageUpload(image: File) {
 }
 
 export async function getUser(userEmail: string) {
-    const user = await getSingleUser(userEmail);
-    if (user) {
-        return user;
-    } else {
+    try {
+        const user = await getSingleUser(userEmail);
+        if (user) {
+            return user;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
         return null;
     }
 }
@@ -87,7 +93,7 @@ export async function submitAvatar(data: FormData) {
         if (input.type === 'image/jpeg' || input.type === 'image/png') {
             const uploadedImage = await imageUpload(input);
             await updateAvatar(uploadedImage.url);
-            revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
+            revalidatePath("/pages/profile"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
         }
     }
 }
