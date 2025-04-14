@@ -1,28 +1,26 @@
+// app/api/trade-spots/route.ts
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  const { lat, lng } = await req.json();
-  if (!lat || !lng) return NextResponse.json({ error: "Missing coordinates" }, { status: 400 });
-
+export async function POST(request: Request) {
   try {
-    const result = await sql`
-      SELECT *, (
-        6371 * acos(
-          cos(radians(${lat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${lng})) +
-          sin(radians(${lat})) * sin(radians(latitude))
-        )
-      ) AS distance
-      FROM trade_spots
+    const { lat, lng } = await request.json();
+
+    if (!lat || !lng) {
+      return NextResponse.json({ error: "Missing lat/lng" }, { status: 400 });
+    }
+
+    const { rows } = await sql`
+      SELECT id, name, address, latitude, longitude
+      FROM locations
       WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-      HAVING distance < ${10}
-      ORDER BY distance ASC
-      LIMIT 20
+      AND verified = true
+      LIMIT 50;
     `;
 
-    return NextResponse.json({ tradeSpots: result.rows });
+    return NextResponse.json({ tradeSpots: rows });
   } catch (err) {
-    console.error("Error fetching Trade Spots:", err);
+    console.error("Error fetching trade spots:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

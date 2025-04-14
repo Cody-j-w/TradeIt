@@ -23,7 +23,7 @@ const NavBar: React.FC = () => {
             alt="Home"
             width={32}
             height={32}
-            className="fill-current"
+            className="fill-current translate-y-[12px]"
             style={{ opacity: pathname === "/pages/home" ? 1 : 0.6 }}
           />
         </Link>
@@ -33,7 +33,7 @@ const NavBar: React.FC = () => {
             alt="Feed"
             width={32}
             height={32}
-            className="fill-current"
+            className="fill-current translate-y-[12px]"
             style={{ opacity: pathname === "/pages/feed" ? 1 : 0.6 }}
           />
         </Link>
@@ -43,7 +43,7 @@ const NavBar: React.FC = () => {
             alt="Search"
             width={32}
             height={32}
-            className="fill-current"
+            className="fill-current translate-y-[12px]"
             style={{ opacity: pathname === "/pages/search" ? 1 : 0.6 }}
           />
         </Link>
@@ -53,7 +53,7 @@ const NavBar: React.FC = () => {
             alt="Profile"
             width={36}
             height={36}
-            className="fill-current"
+            className="fill-current translate-y-[12px]"
             style={{ opacity: pathname === "/pages/profile" ? 1 : 0.6 }}
           />
         </Link>
@@ -63,7 +63,7 @@ const NavBar: React.FC = () => {
             alt="Notifications"
             width={24}
             height={24}
-            className="fill-current translate-y-[8px]"
+            className="fill-current translate-y-[18px]"
             style={{ opacity: pathname === "/pages/activity" ? 1 : 0.6 }}
           />
         </Link>

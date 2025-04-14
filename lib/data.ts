@@ -20,7 +20,7 @@ export async function getSelf() {
     const session = await auth0.getSession();
     const self = await db
         .selectFrom("users")
-        .select(["id", "email", "image", "slug"])
+        .select(["id", "name", "image", "slug"])
         .where("email", "=", session?.user.email!!)
         .execute()
     return self[0];
@@ -104,6 +104,33 @@ export async function insertGood(goodName: string) {
     } else {
         return checkedGood[0];
     }
+}
+
+export async function createTrader(userId: string, goodId: string) {
+    const newTrader = await db
+        .insertInto("traders")
+        .values({
+            user: userId,
+            good: goodId,
+            timestamp: new Date()
+        })
+        .returning(['id', 'user', 'good'])
+        .execute();
+    return newTrader;
+}
+
+export async function createTrade(traderOne: string, traderTwo: string, location: string) {
+    const newTrade = await db
+        .insertInto("trades")
+        .values({
+            trader_a: traderOne,
+            trader_b: traderTwo,
+            location_id: location,
+            timestamp: new Date()
+        })
+        .returning(['trader_a', 'trader_b', 'location_id', 'timestamp'])
+        .execute();
+    return newTrade;
 }
 
 export async function fetchLocation(locationAddress: string) {
@@ -206,6 +233,21 @@ export async function fetchFollows() {
     return followedUsers;
 }
 
+export async function fetchFollowedPosts() {
+    const followedUsers = await fetchFollows();
+    const fids = [];
+    for (const user of followedUsers) {
+        fids.push(user.id);
+    }
+    const followedPosts = await db
+        .selectFrom("posts")
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(["text", "timestamp", "image", "goods.name"])
+        .where("posts.id", "in", fids)
+        .execute()
+    return followedPosts;
+}
+
 export async function addFollow(userId: string,) {
     const follower = await getSelf();
     const fid = follower.id;
@@ -218,4 +260,39 @@ export async function addFollow(userId: string,) {
         })
         .executeTakeFirst();
     return newFollow;
+}
+
+export async function fetchFollowers() {
+    const me = await getSelf();
+    const followers = await db
+        .selectFrom("users")
+        .innerJoin("followings", "follower_id", "users.id")
+        .select(["users.id", "users.name", "users.image"])
+        .where("followings.user_id", "=", me.id)
+        .execute();
+    return followers;
+}
+
+export async function updateUsername(name: string) {
+    const me = await getSelf();
+    const newUsername = await db
+        .updateTable("users")
+        .set({
+            name: name
+        })
+        .where('id', '=', me.id)
+        .executeTakeFirst();
+    return newUsername;
+}
+
+export async function updateAvatar(image: string) {
+    const me = await getSelf();
+    const newAvatar = await db
+        .updateTable("users")
+        .set({
+            image: image
+        })
+        .where('id', '=', me.id)
+        .executeTakeFirst();
+    return newAvatar;
 }
