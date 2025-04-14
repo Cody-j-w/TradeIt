@@ -15,7 +15,7 @@ const NavBar: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="bg-trade-green fixed bottom-0 left-0 w-full pb-6">
+    <aside className="bg-trade-green dark:bg-trade-brown fixed bottom-0 left-0 w-full pb-6">
       <nav className="flex justify-around p-4">
         <Link href="/pages/home">
           <Image

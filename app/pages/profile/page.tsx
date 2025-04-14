@@ -1,3 +1,4 @@
+// app/pages/profile
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -5,10 +6,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
 import { getUser } from '@/lib/functions';
+import LogoutButton from '@/components/LogoutButton';
 
 // Placeholder for profile picture
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
 import PencilIcon from '@/assets/pencil.png';
+import SettingsIcon from '@/assets/settings.svg'
+
 
 interface User {
   id: string;
@@ -117,7 +121,7 @@ const Profile = () => {
   return (
     <div>
       {/* Header Section */}
-      <div className="flex flex-col bg-trade-orange p-4">
+      <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="relative">
@@ -130,7 +134,7 @@ const Profile = () => {
               />
               <button
                 onClick={handleProfilePicClick}
-                className="absolute bottom-0 right-3 rounded-full border-1 bg-trade-white p-1"
+                className="absolute bottom-0 right-3 rounded-full border-1 bg-trade-white dark:bg-trade-gray p-1"
               >
                 <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
               </button>
@@ -144,7 +148,7 @@ const Profile = () => {
             </div>
             <div>
               <h2 className="text-lg font-semibold">{user.name}</h2>
-              <p className="text-sm text-gray-500">{user.slug}</p>
+              <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
             </div>
           </div>
         </div>
