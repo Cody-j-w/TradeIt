@@ -93,7 +93,7 @@ export async function submitAvatar(data: FormData) {
         if (input.type === 'image/jpeg' || input.type === 'image/png') {
             const uploadedImage = await imageUpload(input);
             await updateAvatar(uploadedImage.url);
-            revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
+            revalidatePath("/pages/profile"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
         }
     }
 }

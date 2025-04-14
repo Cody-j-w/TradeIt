@@ -17,8 +17,9 @@ import SettingsIcon from '@/assets/settings.svg'
 interface User {
   id: string;
   name: string;
-  image: string;
+  image: string | null;
   slug: string;
+  description?: string | null;
   // ... other user properties that *actually* exist in the database response
 }
 
@@ -31,6 +32,7 @@ const Profile = () => {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -72,7 +74,7 @@ const Profile = () => {
       if (user?.id) {
         // Assuming you have a server action to update the description
         // You'll need to create this server action if it doesn't exist.
-        const response = await fetch('/api/update-description-server', {
+        const response = await fetch('/api/update-description', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -99,11 +101,16 @@ const Profile = () => {
         setProfilePic(reader.result as string);
       };
       reader.readAsDataURL(file);
+	  console.log('New profile picture selected:', reader.result);
     }
   };
 
   const handleProfilePicClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const toggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
   };
 
   if (isLoading) {
@@ -150,6 +157,24 @@ const Profile = () => {
               <h2 className="text-lg font-semibold">{user.name}</h2>
               <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
             </div>
+          </div>
+        {/* Settings Button */}
+		<div className="relative">
+            <button onClick={toggleSettings} className="rounded-full  p-2 bg-trade-white dark:bg-trade-orange">
+              <Image src={SettingsIcon} alt="Settings" className="h-5 w-5" />
+            </button>
+            {isSettingsOpen && (
+              <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
+                  <a href="/account/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    Account Settings
+                  </a>
+                  <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    <LogoutButton />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
