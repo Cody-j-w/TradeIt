@@ -1,6 +1,7 @@
 import { sql } from "@vercel/postgres";
 import { db } from "./db";
 import { Tag } from "./definitions";
+import { auth0 } from "./auth0";
 
 // export async function userInformation() {
 
@@ -15,6 +16,16 @@ import { Tag } from "./definitions";
 
 // }
 
+export async function getSelf() {
+    const session = await auth0.getSession();
+    const self = await db
+        .selectFrom("users")
+        .select(["id", "email", "image", "slug"])
+        .where("email", "=", session?.user.email!!)
+        .execute()
+    return self[0];
+}
+
 export async function userExists(userEmail: string) {
     try {
         const isUser =
@@ -26,14 +37,14 @@ export async function userExists(userEmail: string) {
     }
 }
 
-export async function userLogin(userEmail: string) {
+export async function userLogin(userEmail: string, userPicture: string) {
     const isUser = await userExists(userEmail);
     console.log(isUser);
     if (!isUser) {
         try {
             const newslug = userEmail.split("@")[0];
             const newUser =
-                await sql`INSERT INTO users (name, email, slug) VALUES (${userEmail}, ${userEmail}, ${newslug})`;
+                await sql`INSERT INTO users (name, email, slug, image) VALUES (${userEmail}, ${userEmail}, ${newslug}, ${userPicture})`;
             return newUser.rows;
         } catch (err) {
             console.error("Database Error:", err);
@@ -42,16 +53,24 @@ export async function userLogin(userEmail: string) {
     }
 }
 
-export async function getUser(userEmail: string) {
+export async function getSingleUser(userEmail: string) {
     const isUser = await userExists(userEmail);
     if (isUser) {
         const fetchedUser = await db
             .selectFrom("users")
-            .select(['name', 'image', 'slug'])
+            .select(['id', 'name', 'image', 'slug'])
             .where('email', '=', userEmail)
             .execute();
         return fetchedUser[0];
     }
+}
+
+export async function getUsers() {
+    const users = await db
+        .selectFrom("users")
+        .select(['id', 'name', 'image', 'slug'])
+        .execute();
+    return users;
 }
 
 export async function fetchGood(goodName: string) {
@@ -173,4 +192,30 @@ export async function insertTags(tags: Tag[]) {
         .returning(['id', 'name'])
         .execute();
     return tagInsert;
+}
+
+export async function fetchFollows() {
+    const follower = await getSelf();
+    const fid = follower.id;
+    const followedUsers = await db
+        .selectFrom("users")
+        .innerJoin("followings as f", "f.user_id", "users.id")
+        .select(["users.id", "bio", "name", "image"])
+        .where("f.follower_id", "=", fid)
+        .execute()
+    return followedUsers;
+}
+
+export async function addFollow(userId: string,) {
+    const follower = await getSelf();
+    const fid = follower.id;
+    const newFollow = await db
+        .insertInto("followings")
+        .values({
+            user_id: userId,
+            follower_id: fid,
+            timestamp: new Date()
+        })
+        .executeTakeFirst();
+    return newFollow;
 }
