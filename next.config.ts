@@ -4,6 +4,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'trade-it-blob.public.blob.vercel-storage.com',
+        port: ''
+      }
+    ]
+  },
   rewrites: async () => {
     return [
       {
