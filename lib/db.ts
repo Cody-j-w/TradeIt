@@ -90,7 +90,8 @@ export interface PostsTable {
     user_id: Generated<string>;
     good_id: Generated<string>;
     text: string;
-    image: string | undefined;
+    image: string | null;
+    type: string;
     timestamp: Generated<Date>;
 }
 export interface PostLikesTable {
