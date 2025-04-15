@@ -91,18 +91,22 @@ export async function fetchGoods() {
 }
 
 export async function insertGood(goodName: string) {
-    const checkedGood = await fetchGood(goodName);
-    if (checkedGood.length === 0) {
-        const insertedGood = await db
-            .insertInto('goods')
-            .values({
-                name: goodName
-            })
-            .returning(['id', 'name'])
-            .executeTakeFirst();
-        return insertedGood;
+    if (goodName.length > 0) {
+        const checkedGood = await fetchGood(goodName);
+        if (checkedGood.length === 0) {
+            const insertedGood = await db
+                .insertInto('goods')
+                .values({
+                    name: goodName
+                })
+                .returning(['id', 'name'])
+                .executeTakeFirst();
+            return insertedGood;
+        } else {
+            return checkedGood[0];
+        }
     } else {
-        return checkedGood[0];
+        return null;
     }
 }
 
@@ -159,47 +163,70 @@ export async function fetchPosts() {
     // ??? WHERE DO?
 }
 
-export async function insertPost(user: string, postText: string, goodName: string, image: string | undefined = undefined) {
+export async function insertPost(user: string, postText: string, goodName: string, type: string, image: string | null = null) {
 
-	const newTags = await fetchTagsFromPost(postText);
-  
-	const tagInsert = await insertTags(newTags);
-  
-	const postGood = await insertGood(goodName);
-  
-	const newPost = await createPost(postText, user, postGood?.id!!, image);
-  
-	const relations = [];
-	for (const tag of tagInsert) {
-	  relations.push({ 'post_id': newPost[0].id, 'tag_id': tag.id });
-	}
-	const newPostTags = await db
-	  .insertInto('posts_tags')
-	  .values(relations)
-	  .returning(['post_id', 'tag_id'])
-	  .execute()
-  
-	return newPost; // Return the result of createPost
-  }
 
-export async function createPost(text: string, user_id: string, good_id: string, image: string | undefined = undefined): Promise<any | null> { // Replace 'any' with the actual post type if you have one
-	try {
-	  const newPost = await db
-		.insertInto('posts')
-		.values({
-		  text: text,
-		  user_id: user_id,
-		  good_id: good_id,
-		  image: image
-		})
-		.returning(['id', 'text', 'user_id', 'good_id', 'image']) // Return more data if needed
-		.executeTakeFirst(); // Get the first (and likely only) inserted row
-	  return newPost;
-	} catch (error) {
-	  console.error("Error creating post:", error);
-	  return null;
-	}
-  }
+    const newTags = await fetchTagsFromPost(postText);
+
+    const tagInsert = await insertTags(newTags);
+
+    const postGood = await insertGood(goodName);
+
+    const newPost = postGood !== null ? await createPost(postText, user, postGood?.id!!, type, image) : await createBlog(postText, user, image);
+
+    const relations = [];
+    for (const tag of tagInsert) {
+        if (newPost) {
+            relations.push({ 'post_id': newPost.id, 'tag_id': tag.id });
+        }
+    }
+    const newPostTags = await db
+        .insertInto('posts_tags')
+        .values(relations)
+        .returning(['post_id', 'tag_id'])
+        .execute()
+
+    return newPost;
+}
+
+export async function createPost(text: string, user_id: string, good_id: string, type: string, image: string | null = null) {
+    try {
+        const newPost = await db
+            .insertInto('posts')
+            .values({
+                text: text,
+                user_id: user_id,
+                good_id: good_id,
+                type: type,
+                image: image
+            })
+            .returning(['id'])
+            .executeTakeFirst();
+        return newPost;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function createBlog(text: string, user_id: string, image: string | null = null) {
+    try {
+        const newPost = await db
+            .insertInto('posts')
+            .values({
+                text: text,
+                user_id: user_id,
+                type: 'blog',
+                image: image
+            })
+            .returning(['id'])
+            .executeTakeFirst();
+        return newPost;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
 
 export async function fetchTagsFromPost(postText: string) {
     const tags = await db
@@ -226,6 +253,19 @@ export async function insertTags(tags: Tag[]) {
         .returning(['id', 'name'])
         .execute();
     return tagInsert;
+}
+
+export async function insertLike(post_id: string) {
+    const me = await getSelf();
+    const newLike = await db
+        .insertInto("posts_likes")
+        .values({
+            user_id: me.id,
+            post_id: post_id
+        })
+        .returning(['user_id', 'post_id'])
+        .executeTakeFirst()
+    return newLike;
 }
 
 export async function fetchFollows() {
@@ -314,4 +354,16 @@ export async function updateBio(bio: string) {
         .where('id', '=', me.id)
         .executeTakeFirst();
     return newBio;
+}
+
+export async function updateZip(zip: string) {
+    const me = await getSelf();
+    const updatedZIP = await db
+        .updateTable("users")
+        .set({
+            zip: zip
+        })
+        .where('id', '=', me.id)
+        .executeTakeFirst();
+    return updatedZIP;
 }
