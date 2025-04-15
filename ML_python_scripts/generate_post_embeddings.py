@@ -124,6 +124,11 @@ def update_post_embeddings():
         }
 
         embedding = generate_weighted_embeddings(post_dict)
+
+        # Maybe do some truncating here
+        # Some PCA, you know?
+        # SVD is what David says
+
         cursor.execute("""
             UPDATE posts
             SET embedding = %s

@@ -17,7 +17,7 @@ import os
 from typing import Optional, List
 from datetime import datetime
 
-import cosine_similarity as cos_sim
+# import cosine_similarity as cos_sim
 
 app = FastAPI()
 
@@ -51,12 +51,11 @@ def aggrigate_and_JSONify(post_ids, conn):
     cursor.execute("""
         -- This entire query will need to be adjusted
         SELECT p.id, p.text, p.timestamp, p.image,
-            goods.name as goods, u.id AS user_id, u.name, u.avatar
+            goods.name as goods, u.name, u.image
         FROM posts p
         JOIN goods on goods.id = p.good_id
         JOIN users u ON p.user_id = u.id
-        WHERE p.id = ANY(%s)
-        GROUP BY p.id, u.id
+        WHERE p.id = ANY(%s::uuid[]);
     """, (post_ids,))
 
     post_details = cursor.fetchall()
@@ -73,31 +72,10 @@ def aggrigate_and_JSONify(post_ids, conn):
                 "image": row[3],
                 "goods": row[4],
                 "user": {
-                    "user_id": row[5],
-                    "name": row[6],
-                    "avatar": row[7]
+                    "name": row[5],
+                    "avatar": row[6]
                 },
         })
-    
-    # Below is code that I don't think I need.
-    # It may be cut out before the next push.
-
-    # # That will also need to be rewritten
-    # #   But why?
-    # #   What did past Ace know that I don't?
-    # #   
-    # populated_post_reqs = []
-    # for post_id in post_details:
-    #     if post_id in details_lookup:
-    #         post_data = details_lookup[post_id]
-    #         populated_post_reqs.append({
-    #             "post_id": post_id,
-    #             "text": post_data["text"],
-    #             "goods": post_data["goods"],
-    #             "timestamp": post_data["timestamp"],
-    #             "image": post_data["image"],
-    #             "user": post_data["user"]
-    #         })
 
     return populated_post_recs
 
@@ -128,3 +106,24 @@ def get_recommendations(user_id):
     conn.close()
 
     return populated_post_recs
+
+def test_jsonify():
+    # This is designed to grab post info for the jsonify function.
+    # I already know the jsonify function will need to change
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    test_posts = []
+
+    cursor.execute("""
+        SELECT id FROM posts;
+                   """)
+    
+    test_posts = cursor.fetchall()
+
+    populated_test_posts = aggrigate_and_JSONify(test_posts, conn)
+
+    conn.close()
+
+    return populated_test_posts

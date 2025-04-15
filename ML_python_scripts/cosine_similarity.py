@@ -8,6 +8,7 @@
 import psycopg2
 import os
 
+# Unsure why I have this commented out
 # def get_db_connection():
 #     conn = psycopg2.connect(os.getenv("POSTGRES_URL"))
 #     return conn
