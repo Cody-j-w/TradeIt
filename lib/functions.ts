@@ -1,7 +1,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { addFollow, fetchFollowedPosts, fetchFollows, getSelf, getSingleUser, getUsers, insertGood, insertPost, updateAvatar, updateBio, updateUsername, userLogin } from "./data";
+import { addFollow, fetchFollowedPosts, fetchFollows, getSelf, getSingleUser, getUsers, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data";
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -18,15 +18,6 @@ export async function getMe() {
 export async function login(name: string, image: string) {
     const loginInfo = await userLogin(name, image);
     return loginInfo;
-}
-
-export async function addPost(data: FormData) {
-    const user = (await getSelf()).id;
-    const postText = data.get("post")?.toString();
-    const goodName = data.get("good")?.toString();
-    const image = data.get("image") as File;
-    const imageUrl = (await imageUpload(image)).url;
-    return await insertPost(user, postText!!, goodName!!, imageUrl);
 }
 
 export async function imageUpload(image: File) {
@@ -93,7 +84,7 @@ export async function submitAvatar(data: FormData) {
         if (input.type === 'image/jpeg' || input.type === 'image/png') {
             const uploadedImage = await imageUpload(input);
             await updateAvatar(uploadedImage.url);
-            revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
+            return { "message": "successfully updated" }
         }
     }
 }
@@ -102,7 +93,7 @@ export async function submitUsername(data: FormData) {
     const input = data.get("username")?.toString();
     if (input && input.length > 0) {
         await updateUsername(input);
-        revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
+        return { "message": "successfully updated" }
     }
 }
 
@@ -110,7 +101,15 @@ export async function submitBio(data: FormData) {
     const input = data.get("bio")?.toString();
     if (input) {
         await updateBio(input);
-        revalidatePath("/pages/home"); //placeholder revalidate - change to where ever this function ends up being used, probably /pages/profile
+        return { "message": "successfully updated" }
+    }
+}
+
+export async function submitZip(data: FormData) {
+    const zip = data.get("zip")?.toString();
+    if (zip) {
+        await updateZip(zip);
+        return { "message": "successfully updated" }
     }
 }
 
@@ -118,8 +117,12 @@ export async function submitPost(data: FormData) {
     const user = await getSelf();
     const text = data.get("text")?.toString();
     const postGood = data.get("good")?.toString();
+    let type = data.get("type")?.toString();
+    if (type !== 'UFT' && type !== 'ISO') {
+        type = 'blog';
+    }
     const image = data.get("image") as File;
-    let imgUrl = undefined;
+    let imgUrl = null;
     let good = "";
     if (image.size > 0) {
         if (image.type === 'image/jpeg' || image.type === 'image/png') {
@@ -134,7 +137,17 @@ export async function submitPost(data: FormData) {
         }
     }
     if (good != "" && text) {
-        const newPost = await insertPost(user.id, text, good, imgUrl);
+        const newPost = await insertPost(user.id, text, good, type, imgUrl);
         return newPost;
+    }
+}
+
+export async function likePost(data: FormData) {
+    const post = data.get("post_id")?.toString();
+    if (post) {
+        const newLike = await insertLike(post);
+        return newLike;
+    } else {
+        return null;
     }
 }
