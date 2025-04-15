@@ -150,7 +150,7 @@ export async function submitPost(data: FormData): Promise<boolean> {
             success = true;
         }
     }
-    return true;
+    return success;
 }
 
 export async function likePost(data: FormData) {
