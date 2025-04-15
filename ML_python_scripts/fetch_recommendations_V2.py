@@ -17,7 +17,7 @@ import os
 from typing import Optional, List
 from datetime import datetime
 
-# import cosine_similarity as cos_sim
+import cosine_similarity as cos_sim
 
 app = FastAPI()
 
@@ -88,7 +88,7 @@ def aggrigate_and_JSONify(post_ids, conn):
 # Need me some brain smoother.
 def get_recommendations(user_id):
     conn = get_db_connection()
-    # cursor = conn.cursor()
+    cursor = conn.cursor()
     # Need cursor if not use cursor here?
     # Does not appear so.
 
