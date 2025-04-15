@@ -91,7 +91,7 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
     setSubmissionError(null);
 
     const formData = new FormData();
-    formData.append('post', postText);
+    formData.append('text', postText);
     formData.append('good', goodName);
     formData.append('type', postType); // Append the type
     if (image) {

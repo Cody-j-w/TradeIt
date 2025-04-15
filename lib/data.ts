@@ -165,29 +165,35 @@ export async function fetchPosts() {
 
 export async function insertPost(user: string, postText: string, goodName: string, type: string, image: string | null = null) {
 
-
+    console.log("user: " + user);
+    console.log("post text: " + postText);
+    console.log("good name: " + goodName);
+    console.log("type: " + type);
     const newTags = await fetchTagsFromPost(postText);
+    let tagInsert = null;
+    if (newTags.length > 0) {
+        console.log(newTags);
+        tagInsert = await insertTags(newTags);
 
-    const tagInsert = await insertTags(newTags);
-
+    }
     const postGood = await insertGood(goodName);
 
     const newPost = postGood !== null ? await createPost(postText, user, postGood?.id!!, type, image) : await createBlog(postText, user, image);
 
-    if (newPost === null) {
-        console.log("failed to create post");
-    }
     const relations = [];
-    for (const tag of tagInsert) {
-        if (newPost) {
-            relations.push({ 'post_id': newPost.id, 'tag_id': tag.id });
+    if (tagInsert !== null) {
+        for (const tag of tagInsert) {
+            if (newPost) {
+                relations.push({ 'post_id': newPost.id, 'tag_id': tag.id });
+            }
         }
+        const newPostTags = await db
+            .insertInto('posts_tags')
+            .values(relations)
+            .returning(['post_id', 'tag_id'])
+            .execute()
     }
-    const newPostTags = await db
-        .insertInto('posts_tags')
-        .values(relations)
-        .returning(['post_id', 'tag_id'])
-        .execute()
+
 
     return newPost;
 }
@@ -205,6 +211,7 @@ export async function createPost(text: string, user_id: string, good_id: string,
             })
             .returning(['id'])
             .executeTakeFirst();
+        console.log(newPost);
         return newPost;
     } catch (err) {
         console.error(err);
@@ -245,13 +252,15 @@ export async function fetchTagsFromPost(postText: string) {
             newTags.push({ 'name': sanitizedTag });
         }
     }
-
     return newTags;
 }
 
 export async function insertTags(tags: Tag[]) {
+    for (const tag of tags) {
+        console.log(tag.name);
+    }
     const tagInsert = await db
-        .insertInto('tags')
+        .insertInto("tags")
         .values(tags)
         .returning(['id', 'name'])
         .execute();
