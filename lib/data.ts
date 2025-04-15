@@ -296,3 +296,15 @@ export async function updateAvatar(image: string) {
         .executeTakeFirst();
     return newAvatar;
 }
+
+export async function updateBio(bio: string) {
+    const me = await getSelf();
+    const newBio = await db
+        .updateTable("users")
+        .set({
+            bio: bio
+        })
+        .where('id', '=', me.id)
+        .executeTakeFirst();
+    return newBio;
+}
