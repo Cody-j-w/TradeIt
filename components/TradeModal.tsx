@@ -128,7 +128,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
       className="fixed inset-0 flex justify-center items-center overflow-y-auto"
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}
     >
-      <div ref={modalRef} className="bg-white p-6 rounded-lg w-full max-w-2xl overflow-y-auto">
+      <div ref={modalRef} className="bg-white p-6 rounded-lg w-full max-w-2xl z-50 overflow-y-auto dark:bg-trade-gray">
         <h2 className="text-lg font-semibold mb-4">Create Trade Offer</h2>
 
         {/* Logged-in User Section */}

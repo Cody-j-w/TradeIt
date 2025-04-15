@@ -165,6 +165,7 @@ export async function fetchPosts() {
 
 export async function insertPost(user: string, postText: string, goodName: string, type: string, image: string | null = null) {
 
+
     const newTags = await fetchTagsFromPost(postText);
 
     const tagInsert = await insertTags(newTags);

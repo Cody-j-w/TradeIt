@@ -1,3 +1,4 @@
+// lib/functions
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
@@ -29,10 +30,15 @@ export async function imageUpload(image: File) {
 }
 
 export async function getUser(userEmail: string) {
-    const user = await getSingleUser(userEmail);
-    if (user) {
-        return user;
-    } else {
+    try {
+        const user = await getSingleUser(userEmail);
+        if (user) {
+            return user;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
         return null;
     }
 }
@@ -113,7 +119,7 @@ export async function submitZip(data: FormData) {
     }
 }
 
-export async function submitPost(data: FormData) {
+export async function submitPost(data: FormData): Promise<boolean> {
     const user = await getSelf();
     const text = data.get("text")?.toString();
     const postGood = data.get("good")?.toString();
@@ -122,24 +128,29 @@ export async function submitPost(data: FormData) {
         type = 'blog';
     }
     const image = data.get("image") as File;
-    let imgUrl = null;
-    let good = "";
+    let imgUrl: string | null = null;
+    let good: string | null = null;
+    let success = false;
+  
     if (image.size > 0) {
         if (image.type === 'image/jpeg' || image.type === 'image/png') {
             const uploadedImage = await imageUpload(image);
             imgUrl = uploadedImage.url;
         }
     }
+  
     if (postGood) {
         const submittedGood = await insertGood(postGood);
-        if (submittedGood) {
-            good = submittedGood?.name
+        good = submittedGood?.name ?? null;
+    }
+  
+    if (text) {
+        const newPost = await insertPost(user.id, text, good ??, type, imgUrl);
+        if (newPost) {
+          success = true;
         }
     }
-    if (good != "" && text) {
-        const newPost = await insertPost(user.id, text, good, type, imgUrl);
-        return newPost;
-    }
+  return true;
 }
 
 export async function likePost(data: FormData) {
@@ -151,3 +162,4 @@ export async function likePost(data: FormData) {
         return null;
     }
 }
+

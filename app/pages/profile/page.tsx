@@ -1,23 +1,29 @@
+// app/pages/profile
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
-import { useUser, getAccessToken } from '@auth0/nextjs-auth0';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0';
+import { getUser } from '@/lib/functions';
+import LogoutButton from '@/components/LogoutButton';
 
 // Placeholder for profile picture
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
 import PencilIcon from '@/assets/pencil.png';
+import SettingsIcon from '@/assets/settings.svg'
+
 
 interface User {
   id: string;
-  username: string;
-  userurl: string;
-  // ... other user properties
+  name: string;
+  image: string | null;
+  slug: string;
+  description?: string | null;
+  // ... other user properties that *actually* exist in the database response
 }
 
-const ProfilePage = () => {
-  const { userId } = useParams();
+const Profile = () => {
   const router = useRouter();
   const { user: auth0User, isLoading, error } = useUser();
   const [activeTab, setActiveTab] = useState('Posts');
@@ -26,38 +32,29 @@ const ProfilePage = () => {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = await getAccessToken();
-        setAccessToken(token);
-        // Replace this with your actual API call to fetch user data based on userId
-        // Example using the accessToken:
-        // const response = await fetch(`/api/users/${userId}`, {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // });
-        // const fetchedUser = await response.json();
-        // setUser(fetchedUser);
-
-        // Simulate fetching user data (replace with your actual API call)
-        const fetchedUser: User = {
-          id: userId as string, // Ensure userId is treated as a string
-          username: `User ${userId}`,
-          userurl: `@user${userId}`,
-        };
-        setUser(fetchedUser);
+        if (auth0User?.email) {
+          const fetchedUser = await getUser(auth0User.email);
+          console.log("Fetched User:", fetchedUser);
+          if (fetchedUser) {
+            setUser(fetchedUser); // Only set if not null
+          } else {
+            setUser(null); // Explicitly set to null if necessary
+          }
+        }
       } catch (error: any) {
         console.error('Error fetching user data:', error);
-        // Handle error appropriately (e.g., redirect to an error page)
+        setUser(null); // Handle error case, ensure null is set
       }
     };
 
     fetchUserData();
-  }, [userId, getAccessToken]);
+  }, [auth0User?.email]);
+
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -73,25 +70,26 @@ const ProfilePage = () => {
 
   const handleSaveDescription = async () => {
     setIsEditingDescription(false);
-    // add call to save the description to database
-    if (accessToken) {
-      try {
-        // Make your API call to update the description using the accessToken
-        // await fetch('/api/update-description', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${accessToken}`,
-        //   },
-        //   body: JSON.stringify({ userId, description }),
-        // });
+    try {
+      if (user?.id) {
+        // Assuming you have a server action to update the description
+        // You'll need to create this server action if it doesn't exist.
+        const response = await fetch('/api/update-description', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id, description }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         console.log('Description saved:', description);
-      } catch (error: any) {
-        console.error('Error saving description:', error);
-        // Handle error
       }
-    } else {
-      console.warn('Access token not available.');
+    } catch (error: any) {
+      console.error('Error saving description:', error);
     }
   };
 
@@ -103,6 +101,7 @@ const ProfilePage = () => {
         setProfilePic(reader.result as string);
       };
       reader.readAsDataURL(file);
+	  console.log('New profile picture selected:', reader.result);
     }
   };
 
@@ -110,28 +109,8 @@ const ProfilePage = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFollowClick = async () => {
-    // Implement follow logic
-    console.log(`Following user: ${user?.username}`);
-    if (accessToken && auth0User?.sub && user?.id) {
-      try {
-        // Make your API call to follow the user using the accessToken
-        // await fetch('/api/follow-user', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${accessToken}`,
-        //   },
-        //   body: JSON.stringify({ followerId: auth0User.sub, followingId: user.id }),
-        // });
-        console.log('Follow request sent');
-      } catch (error: any) {
-        console.error('Error following user:', error);
-        // Handle error
-      }
-    } else {
-      console.warn('Access token or user information not available.');
-    }
+  const toggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
   };
 
   if (isLoading) {
@@ -142,13 +121,14 @@ const ProfilePage = () => {
     return <div>Error loading profile.</div>;
   }
 
-  // Determine if it's the logged-in user's profile using Auth0 user ID
-  const isOwnProfile = auth0User?.sub === user?.id;
+  if (!user) {
+    return <div>Loading user profile...</div>;
+  }
 
   return (
     <div>
       {/* Header Section */}
-      <div className="flex flex-col bg-trade-orange p-4">
+      <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="relative">
@@ -159,14 +139,12 @@ const ProfilePage = () => {
                 height={60}
                 className="rounded-full mr-4"
               />
-              {isOwnProfile && (
-                <button
-                  onClick={handleProfilePicClick}
-                  className="absolute bottom-0 right-3 rounded-full border-1 bg-trade-white p-1"
-                >
-                  <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
-                </button>
-              )}
+              <button
+                onClick={handleProfilePicClick}
+                className="absolute bottom-0 right-3 rounded-full border-1 bg-trade-white dark:bg-trade-gray p-1"
+              >
+                <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
+              </button>
               <input
                 type="file"
                 accept="image/*"
@@ -176,51 +154,57 @@ const ProfilePage = () => {
               />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">{user?.username}</h2>
-              <p className="text-sm text-gray-500">{user?.userurl}</p>
+              <h2 className="text-lg font-semibold">{user.name}</h2>
+              <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
             </div>
           </div>
-          {!isOwnProfile && auth0User?.sub && ( // Only show follow button if logged in and not own profile
-            <button
-              onClick={handleFollowClick}
-              className="bg-yellow-500 text-white px-4 py-2 rounded-full"
-            >
-              Follow
+        {/* Settings Button */}
+		<div className="relative">
+            <button onClick={toggleSettings} className="rounded-full  p-2 bg-trade-white dark:bg-trade-orange">
+              <Image src={SettingsIcon} alt="Settings" className="h-5 w-5" />
             </button>
-          )}
+            {isSettingsOpen && (
+              <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
+                  <a href="/account/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    Account Settings
+                  </a>
+                  <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    <LogoutButton />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Description Section */}
         <div className="mt-2 flex items-center">
-          {isOwnProfile ? (
-            isEditingDescription ? (
-              <div className="flex items-center w-full">
-                <textarea
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  maxLength={120}
-                  className="border rounded p-2 w-full"
-                  placeholder="Add a short description (max 120 characters)"
-                />
-                <button
-                  onClick={handleSaveDescription}
-                  className="ml-2 bg-blue-500 text-white px-3 py-1 rounded"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center w-full">
-                <button onClick={handleEditDescription} className="text-gray-500 mr-2">
-                  <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
-                </button>
-                <p className="text-sm text-gray-600">
-                  {description || 'Add a short description'}
-                </p>
-              </div>
-            )
+          {isEditingDescription ? (
+            <div className="flex items-center w-full">
+              <textarea
+                value={description}
+                onChange={handleDescriptionChange}
+                maxLength={120}
+                className="border rounded p-2 w-full"
+                placeholder="Add a short description (max 120 characters)"
+              />
+              <button
+                onClick={handleSaveDescription}
+                className="ml-2 bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Save
+              </button>
+            </div>
           ) : (
-            <p className="text-sm text-gray-600">{description}</p>
+            <div className="flex items-center w-full">
+              <button onClick={handleEditDescription} className="text-gray-500 mr-2">
+                <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
+              </button>
+              <p className="text-sm text-gray-600">
+                {description || 'Add a short description'}
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -256,4 +240,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default Profile;
