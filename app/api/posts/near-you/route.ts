@@ -1,47 +1,36 @@
-import { NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
+import { NextResponse } from "next/server";
 
-type RequestBody = {
-  zip: string;
-};
-
-function getNearbyZips(zip: string): string[] {
-  const base = parseInt(zip);
-  if (isNaN(base)) return [zip];
-  return Array.from({ length: 9 }, (_, i) => (base - 4 + i).toString());
-}
-
-export async function POST(req: Request) {
-  const body: RequestBody = await req.json();
-
-  if (!body.zip) {
-    return NextResponse.json({ error: "Missing ZIP code" }, { status: 400 });
-  }
-
-  const nearbyZips = getNearbyZips(body.zip);
-  const zipArrayLiteral = `{${nearbyZips.join(",")}}`;
+export async function GET() {
+  const nearbyZips = ["74101", "74103", "74104", "74105", "74106"];
 
   try {
-    const { rows } = await sql`
-      SELECT
+    // Dynamically build parameterized placeholders like $1, $2, $3...
+    const placeholders = nearbyZips.map((_, i) => `$${i + 1}`).join(", ");
+
+    // Run the query using spread values
+    const query = `
+      SELECT 
         posts.id,
-        posts.content,
+        posts.text,
+        posts.image,
         posts.timestamp,
-        posts.user_id,
-        users.name AS author_name,
-        users.zip AS author_zip,
-        users.image AS author_image,
-        users.slug AS author_slug
+        posts.user,
+        posts.good,
+        users.zip
       FROM posts
       JOIN users ON posts.user_id = users.uuid
-      WHERE users.zip = ANY(${zipArrayLiteral}::text[])
+      WHERE users.zip IN (${placeholders})
       ORDER BY posts.timestamp DESC
-      LIMIT 50;
+      LIMIT 20;
     `;
 
+    // Use sql.query() with raw string + values
+    const { rows } = await sql.query(query, nearbyZips);
+
     return NextResponse.json({ posts: rows });
-  } catch (err) {
-    console.error("Error fetching posts near ZIP:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error) {
+    console.error("❌ Error fetching near-you posts:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

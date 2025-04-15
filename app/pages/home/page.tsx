@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import TradeSpotsMap from '@/components/TradeSpotsMap';
-import NearYouPosts from '@/components/NearYouPosts';
+import NearYouPosts from '../../../components/NearYouPosts';
+
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState('Following');
