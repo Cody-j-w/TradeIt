@@ -179,7 +179,7 @@ export async function insertPost(user: string, postText: string, goodName: strin
     const postGood = await insertGood(goodName);
 
     const newPost = postGood !== null ? await createPost(postText, user, postGood?.id!!, type, image) : await createBlog(postText, user, image);
-    console.log(newPost);
+
     const relations = [];
     if (tagInsert !== null) {
         for (const tag of tagInsert) {
