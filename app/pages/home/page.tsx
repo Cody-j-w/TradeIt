@@ -1,11 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import NearYouPosts from '../../../components/NearYouPosts';
-
+import { useEffect, useState } from 'react';
+import TradeSpotsMap from '@/components/TradeSpotsMap';
+import NearYouPosts from '@/components/NearYouPosts';
+import { useSession } from 'next-auth/react';
 
 const Home = () => {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('Following');
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      setUserId(session.user.id); // Adjust based on your session structure
+    }
+  }, [session]);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -37,7 +46,7 @@ const Home = () => {
       <div className="p-4">
         {activeTab === 'Following' && <div>Following content goes here.</div>}
         {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
-        {activeTab === 'Near You' && <NearYouPosts />}
+        {activeTab === 'Near You' && userId && <NearYouPosts userId={userId} />}
       </div>
     </div>
   );

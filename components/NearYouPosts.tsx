@@ -1,59 +1,88 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-type Post = {
+interface Post {
   id: number;
   text: string;
   image?: string;
-  timestamp: string;
   user: string;
   good: string;
-};
+  timestamp: string;
+  zip: string;
+}
 
-export default function NearYouPosts() {
+interface Props {
+  userId: string;
+}
+
+export default function NearYouPosts({ userId }: Props) {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchPosts = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/posts/near-you?userId=${userId}&limit=20&offset=${page * 20}`);
+      const data = await res.json();
+      if (Array.isArray(data.posts)) {
+        setPosts((prev) => [...prev, ...data.posts]);
+        setHasMore(data.posts.length === 20);
+        setPage((prev) => prev + 1);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error('Error fetching near-you posts:', err);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, loading, hasMore, userId]);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch("/api/posts/near-you");
-        const data = await res.json();
-        setPosts(data.posts || []);
-      } catch (err) {
-        console.error("Error fetching near-you posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPosts();
   }, []);
 
-  if (loading) return <p>Loading posts...</p>;
+  useEffect(() => {
+    if (!bottomRef.current || !hasMore) return;
+
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchPosts();
+      }
+    });
+
+    observer.current.observe(bottomRef.current);
+  }, [fetchPosts, hasMore]);
 
   return (
-    <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)]">
+    <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-150px)] p-4">
       {posts.map((post) => (
-        <div key={post.id} className="border rounded p-4 shadow bg-white">
-          <div className="flex justify-between items-center mb-2">
-            <span className="font-semibold">{post.user}</span>
-            <span className="text-xs text-gray-500">{new Date(post.timestamp).toLocaleString()}</span>
-          </div>
-          <p className="text-sm">{post.text}</p>
+        <div key={post.id} className="bg-white shadow-md rounded p-4">
+          <h2 className="font-bold">{post.user}</h2>
+          <p className="text-gray-700 mb-2">{post.text}</p>
           {post.image && (
             <img
               src={post.image}
-              alt="Post visual"
-              className="mt-2 max-h-64 w-full object-cover rounded"
+              alt="Post image"
+              className="w-full max-h-64 object-cover rounded"
             />
           )}
-          <div className="text-xs text-gray-600 mt-2">
-            Offering: <span className="font-medium">{post.good}</span>
+          <div className="text-sm text-gray-500 mt-2">
+            ZIP: {post.zip} | Item: {post.good}
           </div>
         </div>
       ))}
+      {loading && <p className="text-center text-gray-500">Loading more...</p>}
+      <div ref={bottomRef} />
     </div>
   );
 }

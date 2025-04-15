@@ -19,7 +19,7 @@ export async function GET() {
         posts.good,
         users.zip
       FROM posts
-      JOIN users ON posts.user_id = users.uuid
+      JOIN users ON posts.user_id = users.id
       WHERE users.zip IN (${placeholders})
       ORDER BY posts.timestamp DESC
       LIMIT 20;
