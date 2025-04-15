@@ -9,13 +9,14 @@ export async function POST(req: NextRequest) {
     const user = params.get('user');
     const text = params.get('text');
     const good = params.get('good');
+    const type = params.get('type');
     const image = params.get('image');
 
-    if (user !== null && text !== null && good !== null && (image === undefined || image === null)) {
-        await insertPost(user, text, good);
+    if (user !== null && text !== null && good !== null && type !== null && (image === undefined || image === null)) {
+        await insertPost(user, text, good, type);
         return NextResponse.json({ "message": "post successfully added!" });
-    } else if (user !== null && text !== null && good !== null && (image !== null && image !== undefined)) {
-        await insertPost(user, text, good, image);
+    } else if (user !== null && text !== null && good !== null && type !== null && (image !== null && image !== undefined)) {
+        await insertPost(user, text, good, type, image);
         return NextResponse.json({ "message": "post successfully added!" })
     } else {
         console.log("parameter missing");
