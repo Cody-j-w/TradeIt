@@ -120,27 +120,33 @@ export async function submitBio(data: FormData) {
     }
 }
 
-export async function submitPost(data: FormData) {
-    const user = await getSelf();
-    const text = data.get("text")?.toString();
-    const postGood = data.get("good")?.toString();
-    const image = data.get("image") as File;
-    let imgUrl = undefined;
-    let good = "";
-    if (image.size > 0) {
-        if (image.type === 'image/jpeg' || image.type === 'image/png') {
-            const uploadedImage = await imageUpload(image);
-            imgUrl = uploadedImage.url;
-        }
-    }
-    if (postGood) {
-        const submittedGood = await insertGood(postGood);
-        if (submittedGood) {
-            good = submittedGood?.name
-        }
-    }
-    if (good != "" && text) {
-        const newPost = await insertPost(user.id, text, good, imgUrl);
-        return newPost;
-    }
-}
+export async function submitPost(data: FormData): Promise<boolean> {
+	const user = await getSelf();
+	const text = data.get("text")?.toString();
+	const postGood = data.get("good")?.toString();
+	const image = data.get("image") as File;
+	let imgUrl: string | undefined = undefined;
+	let good: string | null = null; // Allow good to be null initially
+	let success = false;
+  
+	if (image?.size > 0) {
+	  if (image.type === 'image/jpeg' || image.type === 'image/png') {
+		const uploadedImage = await imageUpload(image);
+		imgUrl = uploadedImage?.url; // Handle potential undefined from imageUpload
+	  }
+	}
+  
+	if (postGood) {
+	  const submittedGood = await insertGood(postGood);
+	  good = submittedGood?.name ?? null; // Handle potential undefined from insertGood
+	}
+  
+	if (text) {
+	  const newPost = await insertPost(user.id, text, good ?? "", imgUrl);
+	  if (newPost) {
+		success = true;
+	  }
+	}
+  
+	return success;
+  }

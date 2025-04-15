@@ -1,7 +1,7 @@
 // app/pages/layout
 import NavBar from "@/components/NavBar";
 import { Metadata } from "next";
-import TradeWrapper from "@/components/TradeWrapper";
+import AddNewWrapper from "@/components/AddNewWrapper";
 import React from "react";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NavBar />
         <div>
           <div className="flex-1">{children}</div>
-          <TradeWrapper />
+          <AddNewWrapper />
         </div>
       </div>
   );
