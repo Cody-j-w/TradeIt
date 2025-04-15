@@ -1,8 +1,8 @@
-// app/pages/home/page.tsx
-'use client'
+'use client';
 
 import { useState } from 'react';
 import TradeSpotsMap from '@/components/TradeSpotsMap';
+import NearYouPosts from '@/components/NearYouPosts';
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState('Following');
@@ -37,7 +37,7 @@ const Home = () => {
       <div className="p-4">
         {activeTab === 'Following' && <div>Following content goes here.</div>}
         {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
-        {activeTab === 'Near You' && <TradeSpotsMap />}
+        {activeTab === 'Near You' && <NearYouPosts />}
       </div>
     </div>
   );

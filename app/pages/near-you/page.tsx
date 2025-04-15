@@ -1,94 +1,78 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
-// Define map container style
-const containerStyle = {
-  width: "100%",
-  height: "500px",
-};
-
-// Fallback if no location is available
-const defaultCenter = {
-  lat: 39.5,
-  lng: -98.35,
-};
-
-// Trade Spot data type
-type TradeSpot = {
+interface Post {
   id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  address?: string;
-};
+  content: string;
+  timestamp: string;
+  user_id: string;
+  author_name: string;
+  author_zip: string;
+  author_image: string | null;
+  author_slug: string;
+}
 
 export default function NearYouPage() {
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [tradeSpots, setTradeSpots] = useState<TradeSpot[]>([]);
-  const [fallbackZip, setFallbackZip] = useState("74104"); // TODO: Replace with user ZIP from profile
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getLocation = () => {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const coords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setUserLocation(coords);
-          await fetchTradeSpots(coords);
-        },
-        async () => {
-          await fallbackToZip();
-        }
-      );
-    };
-
-    const fallbackToZip = async () => {
-      const zipRes = await fetch(`/api/zip-center?zip=${fallbackZip}`);
-      const zipData = await zipRes.json();
-      if (zipData?.location) {
-        setUserLocation(zipData.location);
-        await fetchTradeSpots(zipData.location);
-      }
-    };
-
-    const fetchTradeSpots = async (coords: { lat: number; lng: number }) => {
-      const res = await fetch("/api/trade-spots", {
+    const fetchPosts = async () => {
+      // Replace this with dynamic ZIP lookup if needed
+      const userZip = "74101";
+      const res = await fetch("/api/posts/near-you", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(coords),
+        body: JSON.stringify({ zip: userZip }),
       });
       const data = await res.json();
-      setTradeSpots(data.tradeSpots);
+      setPosts(data.posts);
+      setLoading(false);
     };
 
-    getLocation();
+    fetchPosts();
   }, []);
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Trade Spots Near You</h1>
+      <h1 className="text-2xl font-bold mb-4">Posts Near You</h1>
 
-      <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-        {/* FRONTEND GOOGLE MAPS API KEY */}
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={userLocation || defaultCenter}
-          zoom={userLocation ? 13 : 5}
-        >
-          {userLocation && <Marker position={userLocation} label="You" />}
-          {tradeSpots.map((spot) => (
-            <Marker
-              key={spot.id}
-              position={{ lat: spot.latitude, lng: spot.longitude }}
-              label={spot.name}
-            />
+      {loading ? (
+        <p className="text-gray-500">Loading nearby posts...</p>
+      ) : posts.length === 0 ? (
+        <p className="text-gray-500">No posts nearby yet.</p>
+      ) : (
+        <div className="space-y-4 overflow-y-auto max-h-[80vh]">
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              className="bg-white rounded-xl shadow-md p-4 border border-gray-100"
+            >
+              <div className="flex items-center mb-2">
+                {post.author_image ? (
+                  <Image
+                    src={post.author_image}
+                    alt={post.author_name}
+                    width={40}
+                    height={40}
+                    className="rounded-full mr-3"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gray-300 rounded-full mr-3" />
+                )}
+                <div>
+                  <p className="font-semibold text-sm">{post.author_name}</p>
+                  <p className="text-xs text-gray-500">ZIP: {post.author_zip}</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-800 whitespace-pre-wrap">{post.content}</p>
+              <p className="text-xs text-gray-400 mt-2">{new Date(post.timestamp).toLocaleString()}</p>
+            </div>
           ))}
-        </GoogleMap>
-      </LoadScript>
+        </div>
+      )}
     </div>
   );
 }
