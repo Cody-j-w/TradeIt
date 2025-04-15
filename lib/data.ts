@@ -174,6 +174,9 @@ export async function insertPost(user: string, postText: string, goodName: strin
 
     const newPost = postGood !== null ? await createPost(postText, user, postGood?.id!!, type, image) : await createBlog(postText, user, image);
 
+    if (newPost === null) {
+        console.log("failed to create post");
+    }
     const relations = [];
     for (const tag of tagInsert) {
         if (newPost) {
