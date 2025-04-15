@@ -1,24 +1,22 @@
-// components/PostModal.tsx
+// components/BlogModal.tsx
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { submitPost } from '@/lib/functions';
+import { submitPost } from '@/lib/functions'; // Assuming submitPost handles blog posts
 
-interface PostModalProps {
+interface BlogModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
+const BlogModal: React.FC<BlogModalProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the hidden file input
   const [postText, setPostText] = useState('');
-  const [goodName, setGoodName] = useState('');
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [postType, setPostType] = useState<'UFT' | 'ISO'>('UFT'); // Default to 'UFT'
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,11 +37,9 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) {
       setPostText('');
-      setGoodName('');
-      setImage(null);
-      setImagePreviewUrl(null);
+      setImages([]);
+      setImagePreviewUrls([]);
       setSubmissionError(null);
-      setPostType('UFT'); // Reset type when modal closes
     }
   }, [isOpen]);
 
@@ -51,34 +47,46 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
     setPostText(e.target.value);
   };
 
-  const handleGoodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGoodName(e.target.value);
-  };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFile(file);
+    const files = e.target.files;
+    if (files) {
+      handleFiles(Array.from(files));
     } else {
-      setImage(null);
-      setImagePreviewUrl(null);
+      setImages([]);
+      setImagePreviewUrls([]);
     }
   };
 
-  const handleFile = useCallback((file: File) => {
-    setImage(file);
-    setImagePreviewUrl(URL.createObjectURL(file));
-  }, []);
+  const handleFiles = useCallback((files: File[]) => {
+    const newImages = [...images];
+    const newImagePreviewUrls: string[] = [...imagePreviewUrls];
+
+    for (let i = 0; i < files.length && newImages.length < 5; i++) {
+      const file = files[i];
+      if (file.type.startsWith('image/')) {
+        newImages.push(file);
+        newImagePreviewUrls.push(URL.createObjectURL(file));
+      }
+    }
+
+    if (newImages.length > 5) {
+      setSubmissionError("You can upload a maximum of 5 images.");
+      return;
+    }
+
+    setImages(newImages);
+    setImagePreviewUrls(newImagePreviewUrls);
+  }, [images, imagePreviewUrls]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile) {
-      handleFile(droppedFile);
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles) {
+      handleFiles(Array.from(droppedFiles));
     }
-  }, [handleFile]);
+  }, [handleFiles]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -91,24 +99,24 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
     setSubmissionError(null);
 
     const formData = new FormData();
-    formData.append('post', postText);
-    formData.append('good', goodName);
-    formData.append('type', postType); // Append the type
-    if (image) {
-      formData.append('image', image);
-    }
+    formData.append('text', postText);
+    formData.append('type', 'blog'); // Set type to 'blog'
+
+    images.forEach((image, index) => {
+      formData.append(`image${index + 1}`, image);
+    });
 
     try {
       const result = await submitPost(formData);
       if (result) {
-        console.log('Post submitted successfully!', result);
+        console.log('Blog post submitted successfully!', result);
         onClose();
       } else {
-        setSubmissionError('Failed to submit post.');
+        setSubmissionError('Failed to submit blog post.');
       }
     } catch (error: any) {
-      console.error('Error submitting post:', error);
-      setSubmissionError('An unexpected error occurred while submitting the post.');
+      console.error('Error submitting blog post:', error);
+      setSubmissionError('An unexpected error occurred while submitting the blog post.');
     } finally {
       setIsSubmitting(false);
     }
@@ -118,6 +126,11 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
     fileInputRef.current?.click();
   };
 
+  const removeImage = (indexToRemove: number) => {
+    setImages(images.filter((_, index) => index !== indexToRemove));
+    setImagePreviewUrls(imagePreviewUrls.filter((_, index) => index !== indexToRemove));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -125,52 +138,23 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
       className="fixed inset-0 flex justify-center items-center overflow-y-auto z-50 bg-black bg-opacity-50"
     >
       <div ref={modalRef} className="bg-white p-6 rounded-lg w-full max-w-md overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4">Create New Post</h2>
+        <h2 className="text-lg font-semibold mb-4">Create New Blog Post</h2>
         <form onSubmit={handleSubmit}>
-
-          {/* Type Selection */}
-          <div className="mb-4">
-            <label htmlFor="postType" className="block text-gray-700 text-sm font-bold mb-2">
-              Post Type
-            </label>
-            <select
-              id="postType"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={postType}
-              onChange={(e) => setPostType(e.target.value as 'UFT' | 'ISO')}
-            >
-              <option value="UFT">UFT</option>
-              <option value="ISO">ISO</option>
-            </select>
-          </div>
-
           <div className="mb-4">
             <label htmlFor="postText" className="block text-gray-700 text-sm font-bold mb-2">
-              Post Text
+              Blog Text
             </label>
             <textarea
               id="postText"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              rows={4}
-              placeholder="What's on your mind?"
+              rows={6}
+              placeholder="Write your blog post here..."
               value={postText}
               onChange={handlePostChange}
               required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="goodName" className="block text-gray-700 text-sm font-bold mb-2">
-              Good Name (Optional)
-            </label>
-            <input
-              type="text"
-              id="goodName"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Name of something good"
-              value={goodName}
-              onChange={handleGoodChange}
-            />
-          </div>
+
           <div
             className="mb-4 border-dashed border-2 border-gray-400 p-4 rounded-lg text-center cursor-pointer"
             onDrop={handleDrop}
@@ -178,15 +162,26 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
             onClick={triggerFileInput}
           >
             <label htmlFor="image" className="block text-gray-700 text-sm font-bold mb-2">
-              Image (Optional)
+              Images (Up to 5)
             </label>
-            {imagePreviewUrl ? (
-              <div className="mt-2">
-                <img src={imagePreviewUrl} alt="Image Preview" className="max-h-40 rounded" />
+            {imagePreviewUrls.length > 0 ? (
+              <div className="flex flex-wrap justify-center">
+                {imagePreviewUrls.map((previewUrl, index) => (
+                  <div key={index} className="relative m-2">
+                    <img src={previewUrl} alt={`Image Preview ${index + 1}`} className="max-h-40 rounded" />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-red-700"
+                      onClick={() => removeImage(index)}
+                    >
+                      X
+                    </button>
+                  </div>
+                ))}
               </div>
             ) : (
               <div>
-                Drag and drop image here or click to select
+                Drag and drop up to 5 images here or click to select
               </div>
             )}
             <input
@@ -195,9 +190,11 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
               className="hidden"
               onChange={handleImageChange}
               accept="image/png, image/jpeg"
+              multiple // Allow multiple file selection
               ref={fileInputRef}
             />
           </div>
+
           <div className="flex justify-end">
             <button
               type="button"
@@ -222,4 +219,4 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default PostModal;
+export default BlogModal;
