@@ -131,26 +131,26 @@ export async function submitPost(data: FormData): Promise<boolean> {
     let imgUrl: string | null = null;
     let good: string | null = null;
     let success = false;
-  
+
     if (image.size > 0) {
         if (image.type === 'image/jpeg' || image.type === 'image/png') {
             const uploadedImage = await imageUpload(image);
             imgUrl = uploadedImage.url;
         }
     }
-  
+
     if (postGood) {
         const submittedGood = await insertGood(postGood);
         good = submittedGood?.name ?? null;
     }
-  
+
     if (text) {
-        const newPost = await insertPost(user.id, text, good ??, type, imgUrl);
+        const newPost = await insertPost(user.id, text, good ?? "", type, imgUrl);
         if (newPost) {
-          success = true;
+            success = true;
         }
     }
-  return true;
+    return true;
 }
 
 export async function likePost(data: FormData) {
