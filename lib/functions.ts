@@ -162,4 +162,3 @@ export async function likePost(data: FormData) {
         return null;
     }
 }
-

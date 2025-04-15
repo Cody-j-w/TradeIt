@@ -1,93 +1,132 @@
 // components/AddNewWrapper.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddNewButton from '@/components/AddNewButton';
 import TradeModal from '@/components/TradeModal';
 import PostModal from '@/components/PostModal';
+import BlogModal from '@/components/BlogModal';
+import { getMe, getAllUsers } from '@/lib/functions';
+import { UsersTable } from '@/lib/db'; // Correct import path
 
 interface User {
-  id: number;
-  username: string;
-  avatar: string;
+    id: string; // Keep as string for compatibility (or adjust TradeModal)
+    name: string;
+    image: string;
+    slug: string;
+    username: string;
+    avatar: string;
 }
 
 interface Item {
-  id: number;
-  userId: number;
-  name: string;
-  description: string;
-  imageUrl: string;
+    id: number;
+    userId: number;
+    name: string;
+    description: string;
+    imageUrl: string;
 }
 
 const AddNewWrapper: React.FC = () => {
-  const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState<User>({
-    id: 1,
-    username: 'CurrentUser',
-    avatar: '/path/to/current/avatar.jpg',
-  });
-  const [loggedInUserItems, setLoggedInUserItems] = useState<Item[]>([
-    { id: 101, userId: 1, name: 'Item 1', description: 'Description 1', imageUrl: '/path/to/item1.jpg' },
-    { id: 102, userId: 1, name: 'Item 2', description: 'Description 2', imageUrl: '/path/to/item2.jpg' },
-  ]);
-  const [allUsers, setAllUsers] = useState<User[]>([
-    { id: 2, username: 'UserA', avatar: '/path/to/userA/avatar.jpg' },
-    { id: 3, username: 'UserB', avatar: '/path/to/userB/avatar.jpg' },
-  ]);
-  const [allAvailableItems, setAllAvailableItems] = useState<Item[]>([
-    { id: 201, userId: 2, name: 'Item A', description: 'Description A', imageUrl: '/path/to/itemA.jpg' },
-    { id: 202, userId: 2, name: 'Item B', description: 'Description B', imageUrl: '/path/to/itemB.jpg' },
-    { id: 301, userId: 3, name: 'Item C', description: 'Description C', imageUrl: '/path/to/itemC.jpg' },
-  ]);
+    const [isTradeModalOpen, setIsTradeModalOpen] = useState(false);
+    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+    const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState<User | null>(null); // Use User, not UsersTable
+    const [allUsers, setAllUsers] = useState<User[] | null>(null); // Use User[], not UsersTable[]
+    const [loggedInUserItems, setLoggedInUserItems] = useState<Item[]>([]);
+    const [allAvailableItems, setAllAvailableItems] = useState<Item[]>([]);
 
-  const openTradeModal = () => {
-    setIsTradeModalOpen(true);
-  };
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const user = await getMe();
+            if (user) {
+                // Adapt UsersTable to User immediately
+                const adaptedUser: User = {
+                    id: user.id,
+                    name: user.name,
+                    image: user.image,
+                    slug: user.slug,
+                    username: "default_username", // Replace with actual logic
+                    avatar: "/default/avatar.png",   // Replace with actual logic
+                };
+                setLoggedInUser(adaptedUser);
+            }
 
-  const closeTradeModal = () => {
-    setIsTradeModalOpen(false);
-  };
+            const users = await getAllUsers();
+            if (users) {
+                const adaptedUsers: User[] = users.map(u => ({
+                    id: u.id,
+                    name: u.name,
+                    image: u.image,
+                    slug: u.slug,
+                    username: "default_username", // Replace with actual logic
+                    avatar: "/default/avatar.png",   // Replace with actual logic
+                }));
+                setAllUsers(adaptedUsers);
+            }
+        };
 
-  const openPostModal = () => {
-    setIsPostModalOpen(true);
-  };
+        fetchUserData();
+    }, []);
 
-  const closePostModal = () => {
-    setIsPostModalOpen(false);
-  };
+    const openTradeModal = () => {
+        setIsTradeModalOpen(true);
+    };
 
-  return (
-    <>
-      {/* Trade Button (Floating) - Always render AddNewButton */}
-      <AddNewButton
-        onOpenPostModal={openPostModal}
-        onOpenBlogModal={() => console.log('Open Blog Modal')}
-        onOpenTradeModal={openTradeModal}
-      />
+    const closeTradeModal = () => {
+        setIsTradeModalOpen(false);
+    };
 
-      {/* Conditionally render TradeModal */}
-      {isTradeModalOpen && (
-        <TradeModal
-          isOpen={isTradeModalOpen}
-          onClose={closeTradeModal}
-          loggedInUser={loggedInUser}
-          loggedInUserItems={loggedInUserItems}
-          allUsers={allUsers}
-          allAvailableItems={allAvailableItems}
-        />
-      )}
+    const openPostModal = () => {
+        setIsPostModalOpen(true);
+    };
 
-      {/* Conditionally render PostModal */}
-      {isPostModalOpen && (
-        <PostModal
-          isOpen={isPostModalOpen}
-          onClose={closePostModal}
-        />
-      )}
-    </>
-  );
+    const closePostModal = () => {
+        setIsPostModalOpen(false);
+    };
+
+    const openBlogModal = () => {
+        setIsBlogModalOpen(true);
+    };
+
+    const closeBlogModal = () => {
+        setIsBlogModalOpen(false);
+    };
+
+    if (!loggedInUser || !allUsers) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <>
+            <AddNewButton
+                onOpenPostModal={openPostModal}
+                onOpenBlogModal={openBlogModal}
+                onOpenTradeModal={openTradeModal}
+            />
+            {isTradeModalOpen && (
+                <TradeModal
+                    isOpen={isTradeModalOpen}
+                    onClose={closeTradeModal}
+                    loggedInUser={loggedInUser}
+                    loggedInUserItems={loggedInUserItems}
+                    allUsers={allUsers}
+                    allAvailableItems={allAvailableItems}
+                />
+            )}
+            {isPostModalOpen && (
+                <PostModal
+                    isOpen={isPostModalOpen}
+                    onClose={closePostModal}
+                />
+            )}
+            {isBlogModalOpen && (
+                <BlogModal
+                    isOpen={isBlogModalOpen}
+                    onClose={closeBlogModal}
+                />
+            )}
+        </>
+    );
 };
 
 export default AddNewWrapper;
