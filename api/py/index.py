@@ -3,7 +3,8 @@ from fastapi import FastAPI
 
 # imports for generating embeddings
 from ML_python_scripts.generate_post_embeddings import update_post_embeddings
-from ML_python_scripts.fetch_recommendations_V2 import test_jsonify
+from ML_python_scripts.fetch_recommendations_V2 import test_jsonify, get_recommendations, PostRecommendation
+from typing import List
 
 # imports for fetching the recommended posts
 # from ML_python_scripts.fetch_recommendations_V2 import get_recommendations, UserProfile, PostRecommendation
@@ -26,11 +27,11 @@ def update_embeddings():
 
 
 # I genuinely have no idea what I'm doing but I think it is that simple.
-# @app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
-# def fetch_recommendations(user_id):
-    # recommended_posts = get_recommendations(user_id)
+@app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
+def fetch_recommendations(user_id):
+    recommended_posts = get_recommendations(user_id)
 
-    # return recommended_posts
+    return recommended_posts
 
 # Still no idea what I'm doing but we're gonna give it our best.
 @app.get("/api/py/test_json")

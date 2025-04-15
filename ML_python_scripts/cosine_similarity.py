@@ -5,6 +5,7 @@
 # I do want to at some point throw some conditional timing on there
 # Now is not the time though
 
+# These are probably fine to comment out but idk
 import psycopg2
 import os
 

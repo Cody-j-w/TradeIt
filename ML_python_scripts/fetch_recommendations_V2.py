@@ -16,8 +16,10 @@ import psycopg2
 import os
 from typing import Optional, List
 from datetime import datetime
+import random
 
-import cosine_similarity as cos_sim
+from .cosine_similarity import recommend_cosine_sim
+import data_fetchers
 
 app = FastAPI()
 
@@ -94,12 +96,32 @@ def get_recommendations(user_id):
 
     post_id_recs = []
 
-    cos_sim_recs = cos_sim.recommend_cosine_sim(user_id, conn)
-
+    cos_sim_recs = recommend_cosine_sim(user_id, conn)
     post_id_recs.append(cos_sim_recs)
+    
+    # Sean's set
+    # This will also be added in later
+    # following_recs = data_fetchers.get_recent_followers_by_user(user_id=user_id, conn=conn)
+    # post_id_recs.append(following_recs)
 
-    # Here's where we would call Sean's other functions
-    # and append them to a list
+    zipcode_recs = data_fetchers.get_recent_posts_by_zipcode(user_id=user_id, conn=conn)
+    post_id_recs.append(zipcode_recs)
+
+    recently_liked_recs = data_fetchers.get_recent_posts_by_liked_profiles(user_id=user_id, conn=conn)
+    post_id_recs.append(recently_liked_recs)
+
+    recent_posts = data_fetchers.get_recent_posts_by_week(user_id=user_id, conn=conn)
+    post_id_recs.append(recent_posts)
+
+    # These will turn on later
+    # tags_liked_recs = data_fetchers.get_weighted_tags_from_liked_posts(user_id=user_id, conn=conn)
+    # post_id_recs.append(tags_liked_recs)
+
+    # Remove duplicate post IDs
+    post_id_recs = list(dict.fromkeys(post_id_recs))
+
+    # Time to shuffle
+    random.shuffle(populated_post_recs)
 
     populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
 
