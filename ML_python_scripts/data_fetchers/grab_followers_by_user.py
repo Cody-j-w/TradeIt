@@ -5,7 +5,7 @@ import psycopg2
 from typing import List, Optional
 
 
-def get_recent_followers_posts(user_id: int, conn: psycopg2.extensions.connection, limit: int = 5) -> Optional[List[int]]:
+def get_recent_followers_by_user(user_id: int, conn: psycopg2.extensions.connection, limit: int = 5) -> Optional[List[int]]:
     """Fetch the most recent post IDs from the user that the given user is following"""
 
     if not isinstance(user_id, int):
