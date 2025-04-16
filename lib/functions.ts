@@ -87,7 +87,7 @@ export async function getAllPosts(page: string) {
 	console.log("Raw posts from fetchPosts in getAllPosts:", posts);
     if (posts) {
         const formattedPosts = posts.map(post => ({
-            id: Math.random().toString(36).substring(2, 15),
+            id: post.id,
             user_id: post.user_id,
             text: post.text,
             image: post.image,
