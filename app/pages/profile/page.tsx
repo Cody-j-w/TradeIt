@@ -52,11 +52,17 @@ const Profile = () => {
           console.log("Fetched User:", fetchedUser);
           if (fetchedUser) {
             setUser(fetchedUser);
-            getMyPosts();
+            setProfilePic(fetchedUser.image);
+            const myPosts = await getMyPosts();
+            if (myPosts) {
+              console.log(myPosts);
+              setPosts(myPosts)
+            }
           } else {
             setUser(null);
           }
         }
+        console.log(posts);
       } catch (error: any) {
         console.error('Error fetching user data:', error);
         setUser(null); // Handle error case, ensure null is set
