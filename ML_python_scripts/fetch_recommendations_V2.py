@@ -19,7 +19,7 @@ from datetime import datetime
 import random
 
 from .cosine_similarity import recommend_cosine_sim
-import data_fetchers
+from .data_fetchers import *
 
 app = FastAPI()
 
@@ -89,6 +89,10 @@ def aggrigate_and_JSONify(post_ids, conn):
 # Or rather, how have I been over thinking this for this long?
 # Need me some brain smoother.
 def get_recommendations(user_id):
+
+    # Debug print to ensure we got here
+    print("Found function")
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     # Need cursor if not use cursor here?
@@ -104,13 +108,13 @@ def get_recommendations(user_id):
     # following_recs = data_fetchers.get_recent_followers_by_user(user_id=user_id, conn=conn)
     # post_id_recs.append(following_recs)
 
-    zipcode_recs = data_fetchers.get_recent_posts_by_zipcode(user_id=user_id, conn=conn)
+    zipcode_recs = get_recent_posts_by_zipcode(user_id=user_id, conn=conn)
     post_id_recs.append(zipcode_recs)
 
-    recently_liked_recs = data_fetchers.get_recent_posts_by_liked_profiles(user_id=user_id, conn=conn)
+    recently_liked_recs = get_recent_posts_by_liked_profiles(user_id=user_id, conn=conn)
     post_id_recs.append(recently_liked_recs)
 
-    recent_posts = data_fetchers.get_recent_posts_by_week(user_id=user_id, conn=conn)
+    recent_posts = get_recent_posts_by_week(user_id=user_id, conn=conn)
     post_id_recs.append(recent_posts)
 
     # These will turn on later

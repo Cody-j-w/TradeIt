@@ -39,14 +39,14 @@ def recommend_cosine_sim(user_id, conn):
             WHERE id IN (
                 SELECT post_id 
                 FROM posts_likes 
-                WHERE user_id = (%s::uuid[])
+                WHERE user_id = %s::uuid
             )
             AND embedding IS NOT NULL
-        ) u_average -- Average of the user embeddings (average of the things they like)
+        ) u_avg -- Average of the user embeddings (average of the things they like)
         WHERE p.id NOT IN (
             SELECT post_id 
             FROM posts_likes 
-            WHERE user_id = (%s::uuid[])
+            WHERE user_id = %s::uuid
         ) -- getting posts the user hasn't already liked
         AND p.embedding IS NOT NULL
         -- this is where I'd include datetime limits I think. Only recommend recent posts, you know?

@@ -27,8 +27,10 @@ def update_embeddings():
 
 
 # I genuinely have no idea what I'm doing but I think it is that simple.
-@app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
+@app.get("/api/py/recommendations/{user_id}", response_model=List[PostRecommendation])
 def fetch_recommendations(user_id):
+    print("API call made it through for user ID:")
+    print(user_id)
     recommended_posts = get_recommendations(user_id)
 
     return recommended_posts
