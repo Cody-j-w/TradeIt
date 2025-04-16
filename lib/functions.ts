@@ -131,11 +131,18 @@ export async function submitPost(data: FormData): Promise<boolean> {
     let imgUrl: string | null = null;
     let good: string | null = null;
     let success = false;
+    // tests
+    console.log("user: " + user.id);
+    console.log("text: " + text);
+    console.log("postGood: " + postGood);
+    console.log("type: " + type);
 
-    if (image.size > 0) {
-        if (image.type === 'image/jpeg' || image.type === 'image/png') {
-            const uploadedImage = await imageUpload(image);
-            imgUrl = uploadedImage.url;
+    if (image !== null) {
+        if (image.size > 0) {
+            if (image.type === 'image/jpeg' || image.type === 'image/png') {
+                const uploadedImage = await imageUpload(image);
+                imgUrl = uploadedImage.url;
+            }
         }
     }
 
