@@ -81,13 +81,13 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-4 mb-4">
             <div className="flex items-center mb-2">
-                <Image src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full mr-2" />
+                <img src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full mr-2" />
                 <div className="font-semibold">{user.name}</div>
             </div>
 
             {post.image && (
                 <div className="mb-2">
-                    <Image src={post.image} alt="Post Image" width={500} height={300} />
+                    <img src={post.image} alt="Post Image" width={500} height={300} />
                 </div>
             )}
 
