@@ -2,7 +2,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data";
+import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, fetchUsersByIds, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data"
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -52,6 +52,26 @@ export async function getAllUsers() {
     }
 }
 
+export async function getUsersById(userIds: string[]): Promise<{[key: string]: { id: string; name: string; avatar: string }}> {
+    try {
+        const usersData = await fetchUsersByIds(userIds);
+        const formattedUsers: {[key: string]: { id: string; name: string; avatar: string }} = {};
+        for (const id in usersData) {
+            if (usersData.hasOwnProperty(id)) {
+                formattedUsers[id] = {
+                    id: usersData[id].id,
+                    name: usersData[id].name,
+                    avatar: usersData[id].image,
+                };
+            }
+        }
+        return formattedUsers;
+    } catch (error) {
+        console.error("Error in lib/functions getUsersByIds:", error);
+        return {};
+    }
+}
+
 export async function getFollowedPosts() {
     const follows = await fetchFollowedPosts();
     if (follows) {
@@ -64,7 +84,16 @@ export async function getFollowedPosts() {
 export async function getAllPosts(page: string) {
     const posts = await fetchPosts(page);
     if (posts) {
-        return posts;
+        const formattedPosts = posts.map(post => ({
+            id: Math.random().toString(36).substring(2, 15), // Keep this if your database doesn't provide a direct post ID
+            user_id: post.user_id, // Access the user's ID from the 'id' property of the joined 'users' table
+            text: post.text,
+            image: post.image,
+            type: 'blog',
+            timestamp: post.timestamp,
+            name: post.name, // Access the user's name from the 'name' property of the joined 'users' table
+        }));
+        return formattedPosts;
     } else {
         return null;
     }
