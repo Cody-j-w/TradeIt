@@ -1,12 +1,16 @@
-import { insertPost } from '@/lib/data';
+import { auth0 } from '@/lib/auth0';
+import { getSelf, insertPost } from '@/lib/data';
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-    // authentication check
-
+    const auth = await auth0.getSession()
+    if (!auth || !auth?.user) {
+        return NextResponse.json({ "error": "Missing authentication" })
+    }
+    const me = await getSelf()
     const url = new URL(req.url);
     const params = url.searchParams;
-    const user = params.get('user');
+    const user = me.id;
     const text = params.get('text');
     const good = params.get('good');
     const type = params.get('type');

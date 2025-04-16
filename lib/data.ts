@@ -317,9 +317,8 @@ export async function fetchFollowedPosts() {
     return followedPosts;
 }
 
-export async function addFollow(userId: string,) {
-    const follower = await getSelf();
-    const fid = follower.id;
+export async function addFollow(userId: string, followerId: string) {
+    const fid = followerId;
     const newFollow = await db
         .insertInto("followings")
         .values({
@@ -386,6 +385,17 @@ export async function updateZip(zip: string) {
             zip: zip
         })
         .where('id', '=', me.id)
+        .executeTakeFirst();
+    return updatedZIP;
+}
+
+export async function updateZipById(zip: string, userId: string) {
+    const updatedZIP = await db
+        .updateTable("users")
+        .set({
+            zip: zip
+        })
+        .where('id', '=', userId)
         .executeTakeFirst();
     return updatedZIP;
 }
