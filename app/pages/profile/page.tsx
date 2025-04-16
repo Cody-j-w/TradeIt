@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
 import { getUser } from '@/lib/functions';
 import LogoutButton from '@/components/LogoutButton';
+import MyPostsCard from '@/components/MyPostsCard'; // Import the MyPostsCard component
+import { getMyPosts } from '@/lib/functions';
 
 // Placeholder for profile picture
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
 import PencilIcon from '@/assets/pencil.png';
-import SettingsIcon from '@/assets/settings.svg'
-
+import SettingsIcon from '@/assets/settings.svg';
 
 interface User {
   id: string;
@@ -20,6 +21,15 @@ interface User {
   image: string | null;
   slug: string;
   description?: string | null;
+}
+
+interface Post {
+  id: string;
+  user_id: string;
+  text: string;
+  image: string | null;
+  type: string;
+  timestamp: Date;
 }
 
 const Profile = () => {
@@ -32,6 +42,7 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]); // State to hold the user's posts
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -41,6 +52,7 @@ const Profile = () => {
           console.log("Fetched User:", fetchedUser);
           if (fetchedUser) {
             setUser(fetchedUser);
+            getMyPosts();
           } else {
             setUser(null);
           }
@@ -53,7 +65,6 @@ const Profile = () => {
 
     fetchUserData();
   }, [auth0User?.email]);
-
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -130,11 +141,14 @@ const Profile = () => {
           <div className="flex items-center">
             <div className="relative">
               <Image
-                src={profilePic || ProfilePicPlaceholder}
+                src={profilePic || user.image || ProfilePicPlaceholder}
                 alt="Profile Picture"
                 width={60}
                 height={60}
                 className="rounded-full mr-4"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = ProfilePicPlaceholder.src; // Fallback if user image fails to load
+                }}
               />
               <button
                 onClick={handleProfilePicClick}
@@ -199,7 +213,7 @@ const Profile = () => {
                 <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
               </button>
               <p className="text-sm text-gray-600">
-                {description || 'Add a short description'}
+                {user.description || 'Add a short description'}
               </p>
             </div>
           )}
@@ -222,16 +236,22 @@ const Profile = () => {
         </button>
       </div>
 
-      {/* Post/Trade Items (Placeholder) */}
+      {/* Post/Trade Items */}
       <div className="space-y-4 p-4">
-        <div className="border bg-trade-white rounded-lg p-4">
-          {/* Post/Trade Content will go here */}
-          <p className="text-gray-600">Post/Trade content will be populated here.</p>
-        </div>
-        <div className="border bg-trade-white rounded-lg p-4">
-          {/* Post/Trade Content will go here */}
-          <p className="text-gray-600">Post/Trade content will be populated here.</p>
-        </div>
+        {activeTab === 'Posts' && posts.length > 0 ? (
+          posts.map((post) => (
+            <MyPostsCard key={post.id} post={post} />
+          ))
+        ) : activeTab === 'Posts' ? (
+          <div className="border bg-trade-white rounded-lg p-4">
+            <p className="text-gray-600">No posts yet.</p>
+          </div>
+        ) : (
+          <div className="border bg-trade-white rounded-lg p-4">
+            {/* Placeholder for Trades content */}
+            <p className="text-gray-600">Trades content will be populated here.</p>
+          </div>
+        )}
       </div>
     </div>
   );
