@@ -2,7 +2,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, fetchUsersByIds, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data"
+import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, fetchUsersByIds, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin, fetchLoggedInUserPosts } from "./data"
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -86,6 +86,26 @@ export async function getAllPosts(page: string) {
     const posts = await fetchPosts(page);
     console.log("Raw posts from fetchPosts:", posts);
     console.log("Raw posts from fetchPosts in getAllPosts:", posts);
+    if (posts) {
+        const formattedPosts = posts.map(post => ({
+            id: post.id,
+            user_id: post.user_id,
+            text: post.text,
+            image: post.image,
+            type: post.type,
+            timestamp: post.timestamp,
+            name: post.name,
+        }));
+        console.log("Formatted posts:", formattedPosts);
+        return formattedPosts;
+    } else {
+        console.log("fetchPosts returned null or undefined");
+        return null;
+    }
+}
+
+export async function getMyPosts() {
+    const posts = await fetchLoggedInUserPosts();
     if (posts) {
         const formattedPosts = posts.map(post => ({
             id: post.id,

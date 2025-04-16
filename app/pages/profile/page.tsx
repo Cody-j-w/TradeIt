@@ -98,7 +98,7 @@ const Profile = () => {
         setProfilePic(reader.result as string);
       };
       reader.readAsDataURL(file);
-	  console.log('New profile picture selected:', reader.result);
+      console.log('New profile picture selected:', reader.result);
     }
   };
 
@@ -155,8 +155,8 @@ const Profile = () => {
               <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
             </div>
           </div>
-        {/* Settings Button */}
-		<div className="relative">
+          {/* Settings Button */}
+          <div className="relative">
             <button onClick={toggleSettings} className="rounded-full  p-2 bg-trade-white dark:bg-trade-orange">
               <Image src={SettingsIcon} alt="Settings" className="h-5 w-5" />
             </button>
