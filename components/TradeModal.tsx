@@ -1,10 +1,18 @@
-// TradeModal.tsx
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react';
 
+// If you have a separate file for your shared User interface (e.g., src/types/user.ts),
+// import it here:
+// import { User } from '@/src/types/user'; 
+
+// If you DON'T have a separate file, define the User interface here, 
+// but make sure it's EXACTLY the same as the one in AddNewWrapper:
 interface User {
-  id: number;
+  id: string; // Changed to string to match UsersTable's id
+  name: string;
+  image: string;
+  slug: string;
   username: string;
   avatar: string;
 }
@@ -20,9 +28,9 @@ interface Item {
 interface TradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  loggedInUser: User;
+  loggedInUser: User | null; // Use the consistent User type
   loggedInUserItems: Item[];
-  allUsers: User[];
+  allUsers: User[]; // Use the consistent User type
   allAvailableItems: Item[];
 }
 
@@ -41,26 +49,26 @@ const TradeModal: React.FC<TradeModalProps> = ({
   const [selectedUserItem, setSelectedUserItem] = useState<Item | null>(null);
   const [isUserSelectOpen, setIsUserSelectOpen] = useState(false);
   const [isItemSelectOpen, setIsItemSelectOpen] = useState(false);
-  const [isUserItemSelectOpen, setIsUserItemSelectOpen] = useState(false); // New state for user item dropdown visibility
-  const [userItemSearchTerm, setUserItemSearchTerm] = useState(''); // New state for user item search term
+  const [isUserItemSelectOpen, setIsUserItemSelectOpen] = useState(false);
+  const [userItemSearchTerm, setUserItemSearchTerm] = useState('');
 
   const modalRef = useRef<HTMLDivElement>(null);
   const userSelectRef = useRef<HTMLDivElement>(null);
   const itemSelectRef = useRef<HTMLDivElement>(null);
-  const userItemSelectRef = useRef<HTMLDivElement>(null); // New ref for user item dropdown
+  const userItemSelectRef = useRef<HTMLDivElement>(null);
 
   const filteredUsers = allUsers.filter((user) =>
     user.username.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
 
   const filteredItems = allAvailableItems.filter(
-    (item) =>
-      item.name.toLowerCase().includes(itemSearchTerm.toLowerCase()) &&
-      selectedUser &&
-      item.userId === selectedUser.id
+	(item) =>
+	  item.name.toLowerCase().includes(itemSearchTerm.toLowerCase()) &&
+	  selectedUser &&
+	  String(item.userId) === selectedUser.id
   );
 
-  const filteredUserItems = loggedInUserItems.filter((item) => // Filter user's items
+  const filteredUserItems = loggedInUserItems.filter((item) =>
     item.name.toLowerCase().includes(userItemSearchTerm.toLowerCase())
   );
 
@@ -73,8 +81,8 @@ const TradeModal: React.FC<TradeModalProps> = ({
       setSelectedUserItem(null);
       setIsUserSelectOpen(false);
       setIsItemSelectOpen(false);
-      setIsUserItemSelectOpen(false); // Reset user item dropdown visibility
-      setUserItemSearchTerm(''); // Reset user item search term
+      setIsUserItemSelectOpen(false);
+      setUserItemSearchTerm('');
     }
   }, [isOpen]);
 
@@ -89,7 +97,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
       if (itemSelectRef.current && !itemSelectRef.current.contains(event.target as Node)) {
         setIsItemSelectOpen(false);
       }
-      if (userItemSelectRef.current && !userItemSelectRef.current.contains(event.target as Node)) { // Check user item dropdown
+      if (userItemSelectRef.current && !userItemSelectRef.current.contains(event.target as Node)) {
         setIsUserItemSelectOpen(false);
       }
     };
@@ -106,7 +114,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
   if (!isOpen) return null;
 
   const defaultUser = {
-    id: 0,
+    id: '0', // Changed to string to match User interface
     username: 'No User Selected',
     avatar: '/path/to/default/user.jpg',
   };
@@ -135,10 +143,10 @@ const TradeModal: React.FC<TradeModalProps> = ({
         <div className="border p-4 mb-4">
           <h3 className="text-md font-semibold mb-2">Your Offer</h3>
           <div className="flex items-start">
-            <img src={loggedInUser.avatar} alt="Your Avatar" className="w-12 h-12 rounded-full mr-4" />
+            <img src={loggedInUser?.avatar} alt="Your Avatar" className="w-12 h-12 rounded-full mr-4" />
             <div>
-              <p className="font-semibold">{loggedInUser.username}</p>
-              <div className="relative" ref={userItemSelectRef}> {/* User Item Select Container */}
+              <p className="font-semibold">{loggedInUser?.username}</p>
+              <div className="relative" ref={userItemSelectRef}>
                 <input
                   type="text"
                   placeholder="Search Your Items"
@@ -183,9 +191,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
           <h3 className="text-md font-semibold mb-2">Trade Partner's Offer</h3>
 
           <div className="flex items-start mb-4">
-            <img src={userToDisplay.avatar} alt="Partner Avatar" className="w-12 h-12 rounded-full mr-4" />
+            <img src={userToDisplay?.avatar} alt="Partner Avatar" className="w-12 h-12 rounded-full mr-4" />
             <div>
-              <p className="font-semibold">{userToDisplay.username}</p>
+              <p className="font-semibold">{userToDisplay?.username}</p>
             </div>
           </div>
 
@@ -257,9 +265,9 @@ const TradeModal: React.FC<TradeModalProps> = ({
 
           {/* Display Selected Item */}
           <div className="flex items-center mt-2">
-            <img src={partnerItemToDisplay.imageUrl} alt={partnerItemToDisplay.name} className="w-8 h-8 rounded mr-2" />
+            <img src={partnerItemToDisplay?.imageUrl} alt={partnerItemToDisplay?.name} className="w-8 h-8 rounded mr-2" />
             <span>
-              {partnerItemToDisplay.name}: {partnerItemToDisplay.description}
+              {partnerItemToDisplay?.name}: {partnerItemToDisplay?.description}
             </span>
           </div>
         </div>
