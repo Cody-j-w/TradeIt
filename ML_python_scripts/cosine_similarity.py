@@ -5,10 +5,12 @@
 # I do want to at some point throw some conditional timing on there
 # Now is not the time though
 
+# These are probably fine to comment out but idk
 import psycopg2
 import os
 
 # Unsure why I have this commented out
+# Oh yeah I set it up to have the conn passed into it
 # def get_db_connection():
 #     conn = psycopg2.connect(os.getenv("POSTGRES_URL"))
 #     return conn
@@ -34,10 +36,20 @@ def recommend_cosine_sim(user_id, conn):
         CROSS JOIN (
             SELECT AVG(embedding) AS avg_embedding
             FROM posts
-            WHERE id IN (SELECT post_id FROM posts_likes WHERE user_id = %s)
-        ) u_average -- Average of the user embeddings (average of the things they like)
-        WHERE p.id NOT IN (SELECT post_id FROM posts_likes WHERE user_id = %s) -- getting posts the user hasn't already liked
-            -- this is where I'd include datetime limits I think. Only recommend recent posts, you know?
+            WHERE id IN (
+                SELECT post_id 
+                FROM posts_likes 
+                WHERE user_id = %s::uuid
+            )
+            AND embedding IS NOT NULL
+        ) u_avg -- Average of the user embeddings (average of the things they like)
+        WHERE p.id NOT IN (
+            SELECT post_id 
+            FROM posts_likes 
+            WHERE user_id = %s::uuid
+        ) -- getting posts the user hasn't already liked
+        AND p.embedding IS NOT NULL
+        -- this is where I'd include datetime limits I think. Only recommend recent posts, you know?
         ORDER BY similarity DESC
         LIMIT 10
     """, (user_id, user_id))
