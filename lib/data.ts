@@ -309,9 +309,10 @@ export async function fetchFollowedPosts() {
     }
     const followedPosts = await db
         .selectFrom("posts")
+        .innerJoin("users", "users.id", "posts.user_id")
         .innerJoin("goods", "goods.id", "posts.good_id")
-        .select(["text", "timestamp", "image", "goods.name"])
-        .where("posts.id", "in", fids)
+        .select(["text", "timestamp", "posts.image as image", "goods.name as good", "users.name as username", "users.image as avatar"])
+        .where("users.id", "in", fids)
         .execute()
     return followedPosts;
 }
