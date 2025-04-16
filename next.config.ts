@@ -10,6 +10,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'trade-it-blob.public.blob.vercel-storage.com',
         port: ''
+      },
+      {
+        protocol: 'https',
+        hostname: 'djyrtfx2a7bufblj.public.blob.vercel-storage.com',
+        port: ''
       }
     ]
   },
