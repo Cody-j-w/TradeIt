@@ -2,7 +2,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data";
+import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, fetchUsersByIds, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data"
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -99,6 +99,7 @@ export async function getAllPosts(page: string) {
         console.log("Formatted posts:", formattedPosts);
         return formattedPosts;
     } else {
+        console.log("fetchPosts returned null or undefined");
         return null;
     }
 }
@@ -113,9 +114,10 @@ export async function getFollowedUsers() {
 }
 
 export async function submitFollow(data: FormData) {
+    const me = await getSelf();
     const followedUser = await data.get("user_id")?.toString();
     if (followedUser) {
-        const newFollow = await addFollow(followedUser)
+        const newFollow = await addFollow(followedUser, me.id)
         return newFollow;
     } else {
         return null;
