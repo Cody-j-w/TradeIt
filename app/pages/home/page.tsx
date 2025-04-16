@@ -1,11 +1,34 @@
-// app/pages/home/page.tsx
-'use client'
+'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TradeSpotsMap from '@/components/TradeSpotsMap';
+import NearYouPosts from '@/components/NearYouPosts';
+import { getSession, getMe } from '@/lib/functions'; // Assuming you have these helpers
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState('Following');
+  const [userZip, setUserZip] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserZip = async () => {
+      try {
+        const user = await getMe();
+        console.log("Fetched user in getMe():", user);
+        if ('zip' in user) {
+          setUserZip(user.zip);
+        } else {
+          console.warn('User zip not found on returned object:', user);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserZip();
+  }, []);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -37,7 +60,15 @@ const Home = () => {
       <div className="p-4">
         {activeTab === 'Following' && <div>Following content goes here.</div>}
         {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
-        {activeTab === 'Near You' && <TradeSpotsMap />}
+        {activeTab === 'Near You' && (
+          loading ? (
+            <div>Loading...</div>
+          ) : userZip ? (
+            <NearYouPosts zip={userZip} />
+          ) : (
+            <div>No ZIP found for this user.</div>
+          )
+        )}
       </div>
     </div>
   );
