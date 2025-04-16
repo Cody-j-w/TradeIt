@@ -80,9 +80,10 @@ export async function getFollowedUsers() {
 }
 
 export async function submitFollow(data: FormData) {
+    const me = await getSelf();
     const followedUser = await data.get("user_id")?.toString();
     if (followedUser) {
-        const newFollow = await addFollow(followedUser)
+        const newFollow = await addFollow(followedUser, me.id)
         return newFollow;
     } else {
         return null;
