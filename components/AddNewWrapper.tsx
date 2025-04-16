@@ -7,7 +7,6 @@ import TradeModal from '@/components/TradeModal';
 import PostModal from '@/components/PostModal';
 import BlogModal from '@/components/BlogModal';
 import { getMe, getAllUsers } from '@/lib/functions';
-import { UsersTable } from '@/lib/db'; // Correct import path
 
 interface User {
     id: string; // Keep as string for compatibility (or adjust TradeModal)
