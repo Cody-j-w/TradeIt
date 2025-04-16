@@ -144,58 +144,58 @@ const Profile = () => {
         return <div>Loading user profile...</div>;
     }
 
-    return (
-        <div>
-            {/* Header Section */}
-            <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                        <div className="relative">
-                            <Image
-                                src={profilePic || ProfilePicPlaceholder}
-                                alt="Profile Picture"
-                                width={60}
-                                height={60}
-                                className="rounded-full mr-4"
-                            />
-                            <button
-                                onClick={handleProfilePicClick}
-                                className="absolute bottom-0 right-3 rounded-full border-1 bg-trade-white dark:bg-trade-gray p-1"
-                            >
-                                <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
-                            </button>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleProfilePicChange}
-                                ref={fileInputRef}
-                                style={{ display: 'none' }}
-                            />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-semibold">{user.name}</h2>
-                            <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
-                        </div>
-                    </div>
-                    {/* Settings Button */}
-                    <div className="relative">
-                        <button onClick={toggleSettings} className="rounded-full  p-2 bg-trade-white dark:bg-trade-orange">
-                            <Image src={SettingsIcon} alt="Settings" className="h-5 w-5" />
-                        </button>
-                        {isSettingsOpen && (
-                            <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
-                                    <a href="/account/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                        Account Settings
-                                    </a>
-                                    <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                        <LogoutButton />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+  return (
+    <div>
+      {/* Header Section */}
+      <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="relative">
+              <img
+                src={profilePic!!}
+                alt="Profile Picture"
+                width={60}
+                height={60}
+                className="rounded-full mr-4"
+              />
+              <button
+                onClick={handleProfilePicClick}
+                className="absolute bottom-0 right-3 rounded-full border-1 bg-trade-white dark:bg-trade-gray p-1"
+              >
+                <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+              />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold">{user.name}</h2>
+              <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
+            </div>
+          </div>
+          {/* Settings Button */}
+          <div className="relative">
+            <button onClick={toggleSettings} className="rounded-full  p-2 bg-trade-white dark:bg-trade-orange">
+              <img src={SettingsIcon} alt="Settings" className="h-5 w-5" />
+            </button>
+            {isSettingsOpen && (
+              <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
+                  <a href="/account/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    Account Settings
+                  </a>
+                  <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                    <LogoutButton />
+                  </div>
                 </div>
+              </div>
+            )}
+          </div>
+        </div>
 
                 {/* Description Section */}
                 <div className="mt-2 flex items-center">
