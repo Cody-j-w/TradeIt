@@ -2,7 +2,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { addFollow, fetchFollowedPosts, fetchFollows, getSelf, getSingleUser, getUsers, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data";
+import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin } from "./data";
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -56,6 +56,15 @@ export async function getFollowedPosts() {
     const follows = await fetchFollowedPosts();
     if (follows) {
         return follows;
+    } else {
+        return null;
+    }
+}
+
+export async function getAllPosts(page: string) {
+    const posts = await fetchPosts(page);
+    if (posts) {
+        return posts;
     } else {
         return null;
     }

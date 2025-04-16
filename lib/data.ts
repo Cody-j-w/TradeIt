@@ -159,8 +159,17 @@ export async function insertLocation(address: string) {
     // then put address and coordinates into DB
 }
 
-export async function fetchPosts() {
-    // ??? WHERE DO?
+export async function fetchPosts(page: string) {
+    const pageNum = parseInt(page);
+    const posts = await db
+        .selectFrom("posts")
+        .innerJoin("users", "users.id", "posts.user_id")
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(['users.name', 'users.image', 'posts.text', 'posts.image', 'posts.timestamp', 'goods.name'])
+        .limit(20)
+        .offset(pageNum * 20)
+        .execute();
+    return posts;
 }
 
 export async function insertPost(user: string, postText: string, goodName: string, type: string, image: string | null = null) {
