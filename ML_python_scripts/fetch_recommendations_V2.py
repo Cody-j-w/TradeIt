@@ -85,8 +85,6 @@ def aggrigate_and_JSONify(post_ids, conn):
     return populated_post_recs
 
 
-
-# @app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
 # I genuinely do NOT understand this.
 # How have I been so stupid for this long?
 # Or rather, how have I been over thinking this for this long?
@@ -113,16 +111,8 @@ def get_recommendations(user_id):
     zipcode_recs = get_recent_posts_by_zipcode(user_id=user_id, conn=conn)
     post_id_recs.append(zipcode_recs)
 
-    print("all post recs after zipcode call:")
-    for post_id in post_id_recs:
-        print(post_id)
-
     recently_liked_recs = get_recent_posts_by_liked_profiles(user_id=user_id, conn=conn)
     post_id_recs.append(recently_liked_recs)
-
-    print("all post recs after recently liked recs:")
-    for post_id in post_id_recs:
-        print(post_id)
 
     recent_posts = get_recent_posts_by_week(user_id=user_id, conn=conn)
     post_id_recs.append(recent_posts)
@@ -131,18 +121,10 @@ def get_recommendations(user_id):
     # tags_liked_recs = data_fetchers.get_weighted_tags_from_liked_posts(user_id=user_id, conn=conn)
     # post_id_recs.append(tags_liked_recs)
 
-    print("all post recs after get recent posts:")
-    for post_id in post_id_recs:
-        print(post_id)
-
     flattened_posts_recs = [item for sublist in post_id_recs for item in sublist]
 
     # Remove duplicate post IDs
     post_id_recs = list(dict.fromkeys(flattened_posts_recs))
-
-    print("all post recs after flattened:")
-    for post_id in post_id_recs:
-        print(post_id)
 
     populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
 
