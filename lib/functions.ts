@@ -83,18 +83,22 @@ export async function getFollowedPosts() {
 
 export async function getAllPosts(page: string) {
     const posts = await fetchPosts(page);
+    console.log("Raw posts from fetchPosts:", posts);
+	console.log("Raw posts from fetchPosts in getAllPosts:", posts);
     if (posts) {
         const formattedPosts = posts.map(post => ({
-            id: Math.random().toString(36).substring(2, 15), // Keep this if your database doesn't provide a direct post ID
-            user_id: post.user_id, // Access the user's ID from the 'id' property of the joined 'users' table
+            id: Math.random().toString(36).substring(2, 15),
+            user_id: post.user_id,
             text: post.text,
             image: post.image,
             type: 'blog',
             timestamp: post.timestamp,
-            name: post.name, // Access the user's name from the 'name' property of the joined 'users' table
+            name: post.name,
         }));
+        console.log("Formatted posts:", formattedPosts);
         return formattedPosts;
     } else {
+        console.log("fetchPosts returned null or undefined");
         return null;
     }
 }

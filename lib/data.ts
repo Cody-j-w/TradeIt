@@ -190,10 +190,11 @@ export async function fetchPosts(page: string) {
         .selectFrom("posts")
         .innerJoin("users", "users.id", "posts.user_id")
         .innerJoin("goods", "goods.id", "posts.good_id")
-        .select(['users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.timestamp', 'goods.name']) // Select users.id AS user_id
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.timestamp', 'goods.name'])
         .limit(20)
         .offset(pageNum * 20)
         .execute();
+    console.log("Raw posts from database in fetchPosts:", posts);
     return posts;
 }
 

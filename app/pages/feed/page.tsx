@@ -28,28 +28,29 @@ const Feed = () => {
     };
 
     useEffect(() => {
-        const fetchInitialPosts = async () => {
-            if (activeTab !== 'Posts') return; // Only fetch if on Posts tab
-
-            setLoading(true);
-            try {
-                const fetchedPosts = await getAllPosts(page.toString());
-                if (fetchedPosts && fetchedPosts.length > 0) {
-                    setPosts(fetchedPosts);
-                    setHasMore(fetchedPosts.length === postsPerPage);
-                } else {
-                    setHasMore(false);
-                }
-            } catch (error) {
-                console.error("Error fetching initial posts:", error);
-                // Handle error (e.g., show a message to the user)
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInitialPosts();
-    }, [activeTab, page]); // Fetch on mount and when activeTab or page changes
+		const fetchInitialPosts = async () => {
+			if (activeTab !== 'Posts') return;
+	
+			setLoading(true);
+			try {
+				const fetchedPosts = await getAllPosts(page.toString());
+				console.log("Fetched posts in Feed:", fetchedPosts); // Log fetched posts
+				if (fetchedPosts && fetchedPosts.length > 0) {
+					setPosts(fetchedPosts);
+					setHasMore(fetchedPosts.length === postsPerPage);
+				} else {
+					setHasMore(false);
+				}
+			} catch (error) {
+				console.error("Error fetching initial posts:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+	
+		fetchInitialPosts();
+	}, [activeTab, page]);
+	
 
     const handleScroll = async () => {
         if (activeTab !== 'Posts' || loading || !hasMore) return;
@@ -103,12 +104,11 @@ const Feed = () => {
                 {activeTab === 'Posts' && (
                     <div>
                         {posts.map(post => (
-                            <PostCard
-                                key={post.id}
-                                post={post}
-                                isDarkMode={false} // Example: Pass dark mode state
-                            />
-                        ))}
+							<PostCard
+								key={post.id}
+								post={post}
+							/>
+						))}
                         {loading && <div>Loading more posts...</div>}
                         {!hasMore && posts.length > 0 && <div>No more posts to load.</div>}
                     </div>
