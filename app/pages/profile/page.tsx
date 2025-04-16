@@ -142,7 +142,7 @@ const Profile = () => {
   return (
     <div>
       {/* Header Section */}
-      <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4">
+      <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4 fixed w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="relative">
@@ -227,7 +227,7 @@ const Profile = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex justify-around bg-gray-300 text-trade-gray">
+      <div className="flex justify-around bg-gray-300 text-trade-gray dark:bg-trade-gray dark:text-trade-orange fixed w-full top-30">
         <button
           className={`px-4 py-2 ${activeTab === 'Posts' ? 'border-b-3 border-trade-blue' : ''}`}
           onClick={() => handleTabClick('Posts')}
@@ -243,7 +243,7 @@ const Profile = () => {
       </div>
 
       {/* Post/Trade Items */}
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 p-4 pt-45 pb-25">
         {activeTab === 'Posts' && posts.length > 0 ? (
           posts.map((post) => (
             <MyPostsCard key={post.id} post={post} />
