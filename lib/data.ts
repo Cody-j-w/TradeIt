@@ -21,7 +21,7 @@ export async function getSelf() {
     const session = await auth0.getSession();
     const self = await db
         .selectFrom("users")
-        .select(["id", "name", "image", "slug"])
+        .select(["id", "name", "image", "slug", "zip"])
         .where("email", "=", session?.user.email!!)
         .execute()
     return self[0];
