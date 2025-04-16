@@ -196,6 +196,19 @@ export async function fetchPosts(page: string) {
     return posts;
 }
 
+export async function fetchLoggedInUserPosts() {
+    const me = await getSelf();
+    const posts = await db
+        .selectFrom("posts")
+        .innerJoin("users", "users.id", "posts.user_id")
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'goods.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
+        .where('user_id', '=', me.id)
+        .execute();
+    console.log("Raw posts from database in fetchPosts:", posts);
+    return posts;
+}
+
 export async function insertPost(user: string, postText: string, goodName: string, type: string, image: string | null = null) {
 
     console.log("user: " + user);
