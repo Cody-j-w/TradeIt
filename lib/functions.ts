@@ -92,7 +92,7 @@ export async function getAllPosts(page: string) {
             user_id: post.user_id,
             text: post.text,
             image: post.image,
-            type: 'blog',
+            type: post.type,
             timestamp: post.timestamp,
             name: post.name,
         }));

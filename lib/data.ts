@@ -74,7 +74,7 @@ export async function getUsers() {
     return users;
 }
 
-export async function fetchUsersByIds(userIds: string[]): Promise<{[key: string]: { id: string; name: string; image: string; slug: string }}> {
+export async function fetchUsersByIds(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; image: string; slug: string } }> {
     try {
         const users = await db
             .selectFrom("users")
@@ -82,7 +82,7 @@ export async function fetchUsersByIds(userIds: string[]): Promise<{[key: string]
             .where("id", "in", userIds)
             .execute();
 
-        const usersById: {[key: string]: { id: string; name: string; image: string; slug: string }} = {};
+        const usersById: { [key: string]: { id: string; name: string; image: string; slug: string } } = {};
         users.forEach(user => {
             usersById[user.id] = {
                 id: user.id,
@@ -189,10 +189,7 @@ export async function fetchPosts(page: string) {
     const posts = await db
         .selectFrom("posts")
         .innerJoin("users", "users.id", "posts.user_id")
-        .innerJoin("goods", "goods.id", "posts.good_id")
-        .select(['posts.id', 'users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.timestamp', 'goods.name'])
-        .limit(20)
-        .offset(pageNum * 20)
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
         .execute();
     console.log("Raw posts from database in fetchPosts:", posts);
     return posts;
