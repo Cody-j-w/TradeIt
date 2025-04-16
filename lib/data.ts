@@ -189,7 +189,8 @@ export async function fetchPosts(page: string) {
     const posts = await db
         .selectFrom("posts")
         .innerJoin("users", "users.id", "posts.user_id")
-        .select(['posts.id', 'users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'goods.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
         .execute();
     console.log("Raw posts from database in fetchPosts:", posts);
     return posts;
