@@ -15,6 +15,7 @@ import psycopg2
 
 import os
 from typing import Optional, List
+from uuid import UUID
 from datetime import datetime
 import random
 
@@ -31,17 +32,17 @@ def get_db_connection():
 # All of these will be changed when I see what the API calls look like
 # These are for JSONifying the data to be returned in an API call later.
 class UserProfile(BaseModel):
-    user_id: int
+    user_id: UUID
     name: str
     avatar: str
     # avatar data type will more than likely be changed
 
 class PostRecommendation(BaseModel):
-    post_id: int
+    post_id: UUID
     text: str
+    timestamp: datetime
+    image: Optional[str] #Once again this will more than likely be changed
     goods: str
-    image: str #Once again this will more than likely be changed
-    created_at: datetime
     user: UserProfile
 
 # This is taking the list of post IDs gathered in get_recommendations
@@ -53,7 +54,8 @@ def aggrigate_and_JSONify(post_ids, conn):
     cursor.execute("""
         -- This entire query will need to be adjusted
         SELECT p.id, p.text, p.timestamp, p.image,
-            goods.name as goods, u.name, u.image
+            goods.name as goods, u.id as user_id,
+            u.name, u.image as user_avatar
         FROM posts p
         JOIN goods on goods.id = p.good_id
         JOIN users u ON p.user_id = u.id
@@ -71,11 +73,12 @@ def aggrigate_and_JSONify(post_ids, conn):
                 "post_id": row[0],
                 "text": row[1],
                 "timestamp": row[2],
-                "image": row[3],
+                "image": row[3] if row[3] else None,
                 "goods": row[4],
                 "user": {
-                    "name": row[5],
-                    "avatar": row[6]
+                    "user_id": row[5],
+                    "name": row[6],
+                    "avatar": row[7]
                 },
         })
 
@@ -92,9 +95,8 @@ def get_recommendations(user_id):
 
     # Debug print to ensure we got here
     print("Found function")
-    
+
     conn = get_db_connection()
-    cursor = conn.cursor()
     # Need cursor if not use cursor here?
     # Does not appear so.
 
@@ -111,8 +113,16 @@ def get_recommendations(user_id):
     zipcode_recs = get_recent_posts_by_zipcode(user_id=user_id, conn=conn)
     post_id_recs.append(zipcode_recs)
 
+    print("all post recs after zipcode call:")
+    for post_id in post_id_recs:
+        print(post_id)
+
     recently_liked_recs = get_recent_posts_by_liked_profiles(user_id=user_id, conn=conn)
     post_id_recs.append(recently_liked_recs)
+
+    print("all post recs after recently liked recs:")
+    for post_id in post_id_recs:
+        print(post_id)
 
     recent_posts = get_recent_posts_by_week(user_id=user_id, conn=conn)
     post_id_recs.append(recent_posts)
@@ -121,13 +131,23 @@ def get_recommendations(user_id):
     # tags_liked_recs = data_fetchers.get_weighted_tags_from_liked_posts(user_id=user_id, conn=conn)
     # post_id_recs.append(tags_liked_recs)
 
+    print("all post recs after get recent posts:")
+    for post_id in post_id_recs:
+        print(post_id)
+
+    flattened_posts_recs = [item for sublist in post_id_recs for item in sublist]
+
     # Remove duplicate post IDs
-    post_id_recs = list(dict.fromkeys(post_id_recs))
+    post_id_recs = list(dict.fromkeys(flattened_posts_recs))
+
+    print("all post recs after flattened:")
+    for post_id in post_id_recs:
+        print(post_id)
+
+    populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
 
     # Time to shuffle
     random.shuffle(populated_post_recs)
-
-    populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
 
     conn.close()
 
