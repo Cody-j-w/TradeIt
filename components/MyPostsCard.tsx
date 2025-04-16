@@ -26,7 +26,7 @@ const MyPostsCard: React.FC<MyPostsCardProps> = ({ post }) => {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+        <div className="bg-trade-white rounded-lg shadow-md p-4 mb-4 dark:bg-trade-gray ">
             <div className="flex items-center mb-2">
                 {/* Display the user's avatar and name (if available) */}
                 {auth0User?.picture && (

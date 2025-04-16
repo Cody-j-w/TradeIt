@@ -73,7 +73,7 @@ export async function getUsersById(userIds: string[]): Promise<{ [key: string]: 
     }
 }
 
-export async function getUserBySlug(slug: string): Promise<{ id: string; name: string; avatar: string } | null> {
+export async function getUserBySlug(slug: string): Promise<{ id: string; bio: string; name: string; avatar: string } | null> {
 	try {
 	  const userData = await fetchUserBySlug(slug);
 	  if (userData) {
@@ -81,6 +81,7 @@ export async function getUserBySlug(slug: string): Promise<{ id: string; name: s
 		  id: userData.id,
 		  name: userData.name,
 		  avatar: userData.image,
+		  bio: userData.bio
 		};
 		return formattedUser;
 	  } else {
