@@ -1,4 +1,4 @@
-// app/feed/page.tsx
+// app/pages/feed/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
