@@ -52,10 +52,11 @@ export async function getAllUsers() {
     }
 }
 
-export async function getUsersById(userIds: string[]): Promise<{[key: string]: { id: string; name: string; avatar: string }}> {
+
+export async function getUsersById(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; avatar: string } }> {
     try {
         const usersData = await fetchUsersByIds(userIds);
-        const formattedUsers: {[key: string]: { id: string; name: string; avatar: string }} = {};
+        const formattedUsers: { [key: string]: { id: string; name: string; avatar: string } } = {};
         for (const id in usersData) {
             if (usersData.hasOwnProperty(id)) {
                 formattedUsers[id] = {
@@ -84,14 +85,14 @@ export async function getFollowedPosts() {
 export async function getAllPosts(page: string) {
     const posts = await fetchPosts(page);
     console.log("Raw posts from fetchPosts:", posts);
-	console.log("Raw posts from fetchPosts in getAllPosts:", posts);
+    console.log("Raw posts from fetchPosts in getAllPosts:", posts);
     if (posts) {
         const formattedPosts = posts.map(post => ({
             id: post.id,
             user_id: post.user_id,
             text: post.text,
             image: post.image,
-            type: 'blog',
+            type: post.type,
             timestamp: post.timestamp,
             name: post.name,
         }));
@@ -113,9 +114,10 @@ export async function getFollowedUsers() {
 }
 
 export async function submitFollow(data: FormData) {
+    const me = await getSelf();
     const followedUser = await data.get("user_id")?.toString();
     if (followedUser) {
-        const newFollow = await addFollow(followedUser)
+        const newFollow = await addFollow(followedUser, me.id)
         return newFollow;
     } else {
         return null;
