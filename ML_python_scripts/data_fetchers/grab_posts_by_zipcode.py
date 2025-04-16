@@ -1,31 +1,11 @@
 #!/usr/bin/env python3
+
 import psycopg2
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-DB_HOST = "example_host"
-DB_NAME = "example_name"
-DB_USER = "example_user"
-DB_PASSWORD = "example password"
 
-
-def connect_to_db() -> psycopg2.extensions.connection:
-    """Establises a connection to the PostgreSQL database."""
-    try:
-        connection = psycopg2.connect(
-            host=DB_HOST,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
-        )
-        return connection
-    except psycopg2.Error as e:
-        raise ConnectionError(
-            f"Failed to connect to the PostgreSQL database: {e}"
-        )
-
-
-def get_recent_posts_by_zipcode(zip_code: int, limit: int = 5) -> Optional[list[int]]:
+def get_recent_posts_by_zipcode(zip_code: int, conn: psycopg2.extensions.connection, limit: int = 5) -> Optional[List[int]]:
     if not isinstance(zip_code, int):
         raise TypeError("zip_code must be an integer.")
     if not isinstance(limit, int) or limit <= 0:
@@ -34,7 +14,7 @@ def get_recent_posts_by_zipcode(zip_code: int, limit: int = 5) -> Optional[list[
     one_week_ago = datetime.now() - timedelta(days=7)
 
     try:
-        with connect_to_db() as con:
+        with conn.cursor() as con:
             with con.cursor() as cursor:
                 cursor.execute('''
                                SELECT id
