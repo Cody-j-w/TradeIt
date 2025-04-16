@@ -1,3 +1,4 @@
+//  lib/data
 import { sql } from "@vercel/postgres";
 import { db } from "./db";
 import { Tag } from "./definitions";
@@ -71,6 +72,30 @@ export async function getUsers() {
         .select(['id', 'name', 'image', 'slug'])
         .execute();
     return users;
+}
+
+export async function fetchUsersByIds(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; image: string; slug: string } }> {
+    try {
+        const users = await db
+            .selectFrom("users")
+            .select(['id', 'name', 'image', 'slug'])
+            .where("id", "in", userIds)
+            .execute();
+
+        const usersById: { [key: string]: { id: string; name: string; image: string; slug: string } } = {};
+        users.forEach(user => {
+            usersById[user.id] = {
+                id: user.id,
+                name: user.name,
+                image: user.image,
+                slug: user.slug,
+            };
+        });
+        return usersById;
+    } catch (error) {
+        console.error("Error fetching users by IDs:", error);
+        return {};
+    }
 }
 
 export async function fetchGood(goodName: string) {
@@ -164,11 +189,9 @@ export async function fetchPosts(page: string) {
     const posts = await db
         .selectFrom("posts")
         .innerJoin("users", "users.id", "posts.user_id")
-        .innerJoin("goods", "goods.id", "posts.good_id")
-        .select(['users.name', 'users.image', 'posts.text', 'posts.image', 'posts.timestamp', 'goods.name'])
-        .limit(20)
-        .offset(pageNum * 20)
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
         .execute();
+    console.log("Raw posts from database in fetchPosts:", posts);
     return posts;
 }
 

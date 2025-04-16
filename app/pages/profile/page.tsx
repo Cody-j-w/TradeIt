@@ -20,7 +20,6 @@ interface User {
   image: string | null;
   slug: string;
   description?: string | null;
-  // ... other user properties that *actually* exist in the database response
 }
 
 const Profile = () => {
@@ -41,9 +40,9 @@ const Profile = () => {
           const fetchedUser = await getUser(auth0User.email);
           console.log("Fetched User:", fetchedUser);
           if (fetchedUser) {
-            setUser(fetchedUser); // Only set if not null
+            setUser(fetchedUser);
           } else {
-            setUser(null); // Explicitly set to null if necessary
+            setUser(null);
           }
         }
       } catch (error: any) {
@@ -72,8 +71,6 @@ const Profile = () => {
     setIsEditingDescription(false);
     try {
       if (user?.id) {
-        // Assuming you have a server action to update the description
-        // You'll need to create this server action if it doesn't exist.
         const response = await fetch('/api/update-description', {
           method: 'POST',
           headers: {

@@ -12,10 +12,9 @@ interface LikeButtonProps {
   postId: string;
   isLiked: boolean;
   onLikeChange: (newLikeState: boolean) => void;
-  isDarkMode: boolean;
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ postId, isLiked, onLikeChange, isDarkMode }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ postId, isLiked, onLikeChange}) => {
   const [localIsLiked, setLocalIsLiked] = useState(isLiked);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,7 +46,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ postId, isLiked, onLikeChange, 
   let likeImage;
   if (!localIsLiked) {
     likeImage = LikeEmpty;
-  } else if (localIsLiked && !isDarkMode) {
+  } else if (localIsLiked) {
     likeImage = LikeLight;
   } else {
     likeImage = LikeDark;

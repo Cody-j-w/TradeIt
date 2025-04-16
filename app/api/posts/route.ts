@@ -1,5 +1,5 @@
 import { auth0 } from '@/lib/auth0';
-import { getSelf, insertPost } from '@/lib/data';
+import { fetchPosts, getSelf, insertPost } from '@/lib/data';
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -31,4 +31,9 @@ export async function POST(req: NextRequest) {
         console.log("image: " + image);
         return NextResponse.json({ "message": "failed to add post" })
     }
+}
+
+export async function GET(req: NextRequest) {
+    const posts = await fetchPosts('1');
+    return NextResponse.json(posts);
 }
