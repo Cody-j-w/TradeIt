@@ -38,10 +38,11 @@ class UserProfile(BaseModel):
     # avatar data type will more than likely be changed
 
 class PostRecommendation(BaseModel):
-    post_id: UUID
+    id: UUID
     text: str
     timestamp: datetime
     image: Optional[str] #Once again this will more than likely be changed
+    type: str
     goods: str
     user: UserProfile
 
@@ -53,7 +54,7 @@ def aggrigate_and_JSONify(post_ids, conn):
 
     cursor.execute("""
         -- This entire query will need to be adjusted
-        SELECT p.id, p.text, p.timestamp, p.image,
+        SELECT p.id, p.text, p.timestamp, p.image, p.type,
             goods.name as goods, u.id as user_id,
             u.name, u.image as user_avatar
         FROM posts p
@@ -70,15 +71,16 @@ def aggrigate_and_JSONify(post_ids, conn):
     populated_post_recs = []
     for row in post_details:
         populated_post_recs.append({
-                "post_id": row[0],
+                "id": row[0],
                 "text": row[1],
                 "timestamp": row[2],
                 "image": row[3] if row[3] else None,
-                "goods": row[4],
+                "type": row[4],
+                "goods": row[5],
                 "user": {
-                    "user_id": row[5],
-                    "name": row[6],
-                    "avatar": row[7]
+                    "user_id": row[6],
+                    "name": row[7],
+                    "avatar": row[8]
                 },
         })
 
