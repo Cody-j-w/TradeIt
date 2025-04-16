@@ -436,3 +436,30 @@ export async function updateZipById(zip: string, userId: string) {
         .executeTakeFirst();
     return updatedZIP;
 }
+
+export async function fetchUserBySlug(slug: string) {
+    const user = await db
+        .selectFrom("users")
+        .select(['id', 'name', 'image', 'slug'])
+        .where('slug', '=', slug)
+        .executeTakeFirst();
+    return user;
+}
+
+export async function updateSlug(slug: string) {
+    const me = await getSelf();
+    const uniqueCheck = await fetchUserBySlug(slug);
+    if (uniqueCheck) {
+        return { "error": "This url is already in use" };
+    } else {
+        const newSlug = await db
+            .updateTable("users")
+            .set({
+                slug: slug
+            })
+            .where("id", "=", me.id)
+            .returning(['slug'])
+            .execute();
+        return newSlug;
+    }
+}
