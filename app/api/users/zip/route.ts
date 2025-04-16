@@ -1,5 +1,5 @@
 import { auth0 } from "@/lib/auth0";
-import { addFollow, fetchFollows } from "@/lib/data";
+import { updateZipById } from "@/lib/data";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -9,18 +9,13 @@ export async function POST(req: NextRequest) {
     }
     const url = new URL(req.url);
     const params = url.searchParams;
-    const follower = params.get("follower");
-    const followed = params.get("followed");
+    const zip = params.get("zip");
+    const user = params.get("user");
     try {
-        await addFollow(followed!!, follower!!);
+        await updateZipById(zip!!, user!!);
         return NextResponse.json({ "message": "new user followed!" });
     } catch (err) {
         console.error("Error: " + err);
         return NextResponse.json({ "message": "there was an error processing your request" });
     }
-}
-
-export async function GET(req: NextRequest) {
-    const follows = await fetchFollows();
-    return NextResponse.json(follows);
 }
