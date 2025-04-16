@@ -21,7 +21,7 @@ export async function getSelf() {
     const session = await auth0.getSession();
     const self = await db
         .selectFrom("users")
-        .select(["id", "name", "image", "slug"])
+        .select(["id", "name", "image", "slug", "zip"])
         .where("email", "=", session?.user.email!!)
         .execute()
     return self[0];
@@ -189,7 +189,21 @@ export async function fetchPosts(page: string) {
     const posts = await db
         .selectFrom("posts")
         .innerJoin("users", "users.id", "posts.user_id")
-        .select(['posts.id', 'users.id as user_id', 'users.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'goods.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
+        .execute();
+    console.log("Raw posts from database in fetchPosts:", posts);
+    return posts;
+}
+
+export async function fetchLoggedInUserPosts() {
+    const me = await getSelf();
+    const posts = await db
+        .selectFrom("posts")
+        .innerJoin("users", "users.id", "posts.user_id")
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'goods.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
+        .where('user_id', '=', me.id)
         .execute();
     console.log("Raw posts from database in fetchPosts:", posts);
     return posts;
@@ -421,4 +435,31 @@ export async function updateZipById(zip: string, userId: string) {
         .where('id', '=', userId)
         .executeTakeFirst();
     return updatedZIP;
+}
+
+export async function fetchUserBySlug(slug: string) {
+    const user = await db
+        .selectFrom("users")
+        .select(['id', 'name', 'image', 'slug'])
+        .where('slug', '=', slug)
+        .executeTakeFirst();
+    return user;
+}
+
+export async function updateSlug(slug: string) {
+    const me = await getSelf();
+    const uniqueCheck = await fetchUserBySlug(slug);
+    if (uniqueCheck) {
+        return { "error": "This url is already in use" };
+    } else {
+        const newSlug = await db
+            .updateTable("users")
+            .set({
+                slug: slug
+            })
+            .where("id", "=", me.id)
+            .returning(['slug'])
+            .execute();
+        return newSlug;
+    }
 }
