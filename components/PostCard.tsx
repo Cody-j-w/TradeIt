@@ -79,7 +79,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-trade-gray">
             <div className="flex items-center mb-2">
                 <img src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full mr-2" />
                 <div className="font-semibold">{user.name}</div>

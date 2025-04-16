@@ -85,7 +85,7 @@ const Feed = () => {
 
     return (
         <div>
-            <div className="flex justify-around bg-gray-300 text-trade-gray">
+            <div className="flex justify-around bg-gray-300 text-trade-gray dark:bg-trade-gray dark:text-trade-orange fixed w-full">
                 <button
                     className={`px-4 py-2 ${activeTab === 'Posts' ? 'border-b-2 border-trade-blue' : ''}`}
                     onClick={() => handleTabClick('Posts')}
@@ -100,7 +100,7 @@ const Feed = () => {
                 </button>
             </div>
 
-            <div className="p-4">
+            <div className="p-4 pt-15 pb-15">
                 {activeTab === 'Posts' && (
                     <div>
                         {posts.map(post => (
