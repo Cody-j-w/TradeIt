@@ -1,16 +1,37 @@
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  const nearbyZips = ["74101", "74103", "74104", "74105", "74106"];
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = 15;
+  const offset = (page - 1) * limit;
+
+  if (!userId) {
+    return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+  }
 
   try {
-    // Dynamically build parameterized placeholders like $1, $2, $3...
+    // Get the zip of the user making the request
+    const zipResult = await sql`
+      SELECT zip FROM users WHERE id = ${userId}
+    `;
+
+    const userZip = zipResult.rows[0]?.zip;
+
+    if (!userZip) {
+      return NextResponse.json({ error: "User ZIP not found" }, { status: 404 });
+    }
+
+    // For now, mock nearby ZIPs
+    const nearbyZips = [userZip, "74101", "74103", "74104", "74105", "74106"];
+
     const placeholders = nearbyZips.map((_, i) => `$${i + 1}`).join(", ");
 
-    // Run the query using spread values
+    // Build the SQL query
     const query = `
-      SELECT 
+      SELECT
         posts.id,
         posts.text,
         posts.image,
@@ -22,10 +43,9 @@ export async function GET() {
       JOIN users ON posts.user_id = users.id
       WHERE users.zip IN (${placeholders})
       ORDER BY posts.timestamp DESC
-      LIMIT 20;
+      LIMIT ${limit} OFFSET ${offset};
     `;
 
-    // Use sql.query() with raw string + values
     const { rows } = await sql.query(query, nearbyZips);
 
     return NextResponse.json({ posts: rows });

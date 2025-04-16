@@ -3,18 +3,29 @@
 import { useEffect, useState } from 'react';
 import TradeSpotsMap from '@/components/TradeSpotsMap';
 import NearYouPosts from '@/components/NearYouPosts';
-import { useSession } from 'next-auth/react';
 
 const Home = () => {
-  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('Following');
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (session?.user?.id) {
-      setUserId(session.user.id); // Adjust based on your session structure
-    }
-  }, [session]);
+    const fetchSession = async () => {
+      try {
+        const res = await fetch('/api/session');
+        const data = await res.json();
+        if (data.user?.sub) {
+          setUserId(data.user.sub); // Auth0 stores ID as "sub"
+        }
+      } catch (err) {
+        console.error('Failed to load session:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSession();
+  }, []);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -46,7 +57,17 @@ const Home = () => {
       <div className="p-4">
         {activeTab === 'Following' && <div>Following content goes here.</div>}
         {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
-        {activeTab === 'Near You' && userId && <NearYouPosts userId={userId} />}
+        {activeTab === 'Near You' && (
+          <>
+            {loading ? (
+              <div>Loading...</div>
+            ) : userId ? (
+              <NearYouPosts userId={userId} />
+            ) : (
+              <div>No session found.</div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
