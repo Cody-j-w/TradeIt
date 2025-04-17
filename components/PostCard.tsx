@@ -75,7 +75,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const formattedTime = parsedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+    <div className="bg-white dark:bg-trade-gray rounded-lg shadow-md p-4 mb-4">
       <div className="flex items-center mb-2 justify-between">
         <div className="flex items-center">
           <img
@@ -89,7 +89,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             <a href={`/users/${user.slug}`} className="hover:underline">{user.name}</a>
           </div>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-trade-orange">
           {formattedDate} {formattedTime}
         </div>
       </div>
