@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import LikeButton from './LikeButton';
 import { getUsersById } from '@/lib/functions';
+import Link from 'next/link';
 
 interface Post {
   id: string;
@@ -86,8 +87,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             className="rounded-full mr-2"
           />
           <div className="font-semibold">
-            <a href={`/users/${user.slug}`} className="hover:underline">{user.name}</a>
-          </div>
+                        <Link href={`/pages/users/${user.slug}`} className="hover:underline text-black dark:text-white">
+                            {user.name}
+                        </Link>
+                    </div>
         </div>
         <div className="text-sm text-gray-500 dark:text-trade-orange">
           {formattedDate} {formattedTime}
