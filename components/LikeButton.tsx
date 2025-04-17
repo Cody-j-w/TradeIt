@@ -4,8 +4,8 @@
 import React, { useState } from 'react';
 import { likePost } from '@/lib/functions';
 import Image from 'next/image';
-import LikeEmpty from "@/assets/likeGrey.svg";
-import LikeLight from "@/assets/likeGreen.svg";
+import LikeEmpty from "@/assets/likeOutlineOrange.svg";
+import LikeLight from "@/assets/likeOrange.svg";
 import LikeDark from "@/assets/likeOrange.svg";
 
 interface LikeButtonProps {
