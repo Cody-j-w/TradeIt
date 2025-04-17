@@ -15,6 +15,7 @@ import psycopg2
 
 import os
 from typing import Optional, List
+from uuid import UUID
 from datetime import datetime
 import random
 
@@ -31,17 +32,18 @@ def get_db_connection():
 # All of these will be changed when I see what the API calls look like
 # These are for JSONifying the data to be returned in an API call later.
 class UserProfile(BaseModel):
-    user_id: int
+    user_id: UUID
     name: str
     avatar: str
     # avatar data type will more than likely be changed
 
 class PostRecommendation(BaseModel):
-    post_id: int
+    id: UUID
     text: str
+    timestamp: datetime
+    image: Optional[str] #Once again this will more than likely be changed
+    type: str
     goods: str
-    image: str #Once again this will more than likely be changed
-    created_at: datetime
     user: UserProfile
 
 # This is taking the list of post IDs gathered in get_recommendations
@@ -52,8 +54,9 @@ def aggrigate_and_JSONify(post_ids, conn):
 
     cursor.execute("""
         -- This entire query will need to be adjusted
-        SELECT p.id, p.text, p.timestamp, p.image,
-            goods.name as goods, u.name, u.image
+        SELECT p.id, p.text, p.timestamp, p.image, p.type,
+            goods.name as goods, u.id as user_id,
+            u.name, u.image as user_avatar
         FROM posts p
         JOIN goods on goods.id = p.good_id
         JOIN users u ON p.user_id = u.id
@@ -68,22 +71,22 @@ def aggrigate_and_JSONify(post_ids, conn):
     populated_post_recs = []
     for row in post_details:
         populated_post_recs.append({
-                "post_id": row[0],
+                "id": row[0],
                 "text": row[1],
                 "timestamp": row[2],
-                "image": row[3],
-                "goods": row[4],
+                "image": row[3] if row[3] else None,
+                "type": row[4],
+                "goods": row[5],
                 "user": {
-                    "name": row[5],
-                    "avatar": row[6]
+                    "user_id": row[6],
+                    "name": row[7],
+                    "avatar": row[8]
                 },
         })
 
     return populated_post_recs
 
 
-
-# @app.get("/recommendations/{user_id}", response_model=List[PostRecommendation])
 # I genuinely do NOT understand this.
 # How have I been so stupid for this long?
 # Or rather, how have I been over thinking this for this long?
@@ -92,9 +95,8 @@ def get_recommendations(user_id):
 
     # Debug print to ensure we got here
     print("Found function")
-    
+
     conn = get_db_connection()
-    cursor = conn.cursor()
     # Need cursor if not use cursor here?
     # Does not appear so.
 
@@ -121,13 +123,15 @@ def get_recommendations(user_id):
     # tags_liked_recs = data_fetchers.get_weighted_tags_from_liked_posts(user_id=user_id, conn=conn)
     # post_id_recs.append(tags_liked_recs)
 
+    flattened_posts_recs = [item for sublist in post_id_recs for item in sublist]
+
     # Remove duplicate post IDs
-    post_id_recs = list(dict.fromkeys(post_id_recs))
+    post_id_recs = list(dict.fromkeys(flattened_posts_recs))
+
+    populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
 
     # Time to shuffle
     random.shuffle(populated_post_recs)
-
-    populated_post_recs = aggrigate_and_JSONify(post_id_recs, conn)
 
     conn.close()
 

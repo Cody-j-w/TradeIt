@@ -57,7 +57,9 @@ def recommend_cosine_sim(user_id, conn):
 
     post_id_list = [post[0] for post in recommended_posts]
 
-    conn.close()
+    print("posts from cosine sim:")
+    for post_id in post_id_list:
+        print(post_id)
 
     return post_id_list
 

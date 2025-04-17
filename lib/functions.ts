@@ -2,7 +2,7 @@
 "use server";
 import { getMaxAge } from "next/dist/server/image-optimizer";
 import { auth0 } from "./auth0";
-import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, fetchUsersByIds, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin, fetchLoggedInUserPosts, fetchUserBySlug } from "./data"
+import { addFollow, fetchFollowedPosts, fetchFollows, fetchPosts, getSelf, getSingleUser, getUsers, fetchUsersByIds, insertGood, insertLike, insertPost, updateAvatar, updateBio, updateUsername, updateZip, userLogin, fetchLoggedInUserPosts, fetchUserBySlug, fetchFollowStatus, fetchPostsById } from "./data"
 import { put } from '@vercel/blob';
 import { revalidatePath } from "next/cache";
 
@@ -53,16 +53,17 @@ export async function getAllUsers() {
 }
 
 
-export async function getUsersById(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; avatar: string } }> {
+export async function getUsersById(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; avatar: string; slug: string } }> {
     try {
         const usersData = await fetchUsersByIds(userIds);
-        const formattedUsers: { [key: string]: { id: string; name: string; avatar: string } } = {};
+        const formattedUsers: { [key: string]: { id: string; name: string; avatar: string; slug: string } } = {};
         for (const id in usersData) {
             if (usersData.hasOwnProperty(id)) {
                 formattedUsers[id] = {
                     id: usersData[id].id,
                     name: usersData[id].name,
                     avatar: usersData[id].image,
+                    slug: usersData[id].slug
                 };
             }
         }
@@ -73,24 +74,25 @@ export async function getUsersById(userIds: string[]): Promise<{ [key: string]: 
     }
 }
 
-export async function getUserBySlug(slug: string): Promise<{ id: string; name: string; avatar: string } | null> {
-	try {
-	  const userData = await fetchUserBySlug(slug);
-	  if (userData) {
-		const formattedUser = {
-		  id: userData.id,
-		  name: userData.name,
-		  avatar: userData.image,
-		};
-		return formattedUser;
-	  } else {
-		return null;
-	  }
-	} catch (error) {
-	  console.error(`Error in lib/functions getUserBySlug for slug "${slug}":`, error);
-	  return null;
-	}
-  }
+export async function getUserBySlug(slug: string): Promise<{ id: string; bio: string; name: string; avatar: string } | null> {
+    try {
+        const userData = await fetchUserBySlug(slug);
+        if (userData) {
+            const formattedUser = {
+                id: userData.id,
+                name: userData.name,
+                avatar: userData.image,
+                bio: userData.bio
+            };
+            return formattedUser;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error in lib/functions getUserBySlug for slug "${slug}":`, error);
+        return null;
+    }
+}
 
 export async function getFollowedPosts() {
     const follows = await fetchFollowedPosts();
@@ -143,6 +145,24 @@ export async function getMyPosts() {
     }
 }
 
+export async function getPostsById(user_id: string) {
+    const posts = await fetchPostsById(user_id);
+    if (posts) {
+        const formattedPosts = posts.map(post => ({
+            id: post.id,
+            user_id: post.user_id,
+            text: post.text,
+            image: post.image,
+            type: post.type,
+            timestamp: post.timestamp,
+            name: post.name,
+        }));
+        return formattedPosts;
+    } else {
+        return null;
+    }
+}
+
 export async function getFollowedUsers() {
     const follows = await fetchFollows();
     if (follows) {
@@ -161,6 +181,11 @@ export async function submitFollow(data: FormData) {
     } else {
         return null;
     }
+}
+
+export async function getFollowStatus(user_id: string) {
+    const status = await fetchFollowStatus(user_id);
+    return status;
 }
 
 export async function getFollowers() {
