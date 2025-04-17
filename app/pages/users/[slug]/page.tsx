@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
 import { getUserBySlug, submitFollow } from '@/lib/functions';
 import { useTransition } from 'react';
@@ -34,8 +34,7 @@ interface Props {
     params: { slug: string };
 }
 
-const UserProfilePage: React.FC<Props> = ({ params }) => {
-    const { slug } = params; // Access slug directly
+const UserProfilePage: React.FC<Props> = () => {
     const router = useRouter();
     const { user: auth0User } = useUser();
     const [activeTab, setActiveTab] = useState('Posts');
@@ -46,18 +45,19 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [isFollowPending, startFollowTransition] = useTransition();
 
+    const params = useParams<{ slug: string }>();
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchUserData: () => Promise<void> = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const fetchedUser = await getUserBySlug(slug);
+                const fetchedUser = await getUserBySlug(params.slug);
                 if (fetchedUser) {
                     setUser({
                         id: fetchedUser.id,
                         name: fetchedUser.name,
                         image: fetchedUser.avatar,
-                        slug: slug,
+                        slug: params.slug,
                         bio: fetchedUser.bio,
                     });
                     fetchUserPosts(fetchedUser.id);
@@ -77,7 +77,7 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
         };
 
         fetchUserData();
-    }, [slug, auth0User?.sub]);
+    }, [params.slug, auth0User?.sub]);
 
     const fetchUserPosts = async (userId: string) => {
         try {
@@ -169,9 +169,8 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
                         <button
                             onClick={onFollowToggle}
                             disabled={isFollowPending}
-                            className={`bg-blue-500 text-white px-3 py-2 rounded-md ${
-                                isFollowing ? 'bg-gray-500' : ''
-                            } ${isFollowPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`bg-blue-500 text-white px-3 py-2 rounded-md ${isFollowing ? 'bg-gray-500' : ''
+                                } ${isFollowPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isFollowPending ? 'Following...' : isFollowing ? 'Unfollow' : 'Follow'}
                         </button>
