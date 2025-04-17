@@ -30,14 +30,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
     const [errorUser, setErrorUser] = useState<string | null>(null);
-
     useEffect(() => {
         const fetchUser = async () => {
             setLoadingUser(true);
             setErrorUser(null);
             try {
                 const usersData = await getUsersById([post.user_id]);
-                console.log("Fetched user data:", usersData);
                 if (usersData && usersData[post.user_id]) {
                     setUser({
                         id: usersData[post.user_id].id,
@@ -77,7 +75,6 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     if (!user) {
         return null;
     }
-
     return (
         <div className="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-trade-gray">
             <div className="flex items-center mb-2">

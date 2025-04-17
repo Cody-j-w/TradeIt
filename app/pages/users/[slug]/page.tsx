@@ -5,13 +5,14 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
-import { getUserBySlug, submitFollow } from '@/lib/functions';
+import { getFollowStatus, getPostsById, getUserBySlug, submitFollow } from '@/lib/functions';
 import { useTransition } from 'react';
 import MyPostsCard from '@/components/MyPostsCard';
 import React from 'react';
 
 // Placeholder for profile picture
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
+import PostCard from '@/components/PostCard';
 
 interface User {
     id: string;
@@ -81,13 +82,10 @@ const UserProfilePage: React.FC<Props> = () => {
 
     const fetchUserPosts = async (userId: string) => {
         try {
-            const response = await fetch(`/api/users/${userId}/posts`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+            const posts = await getPostsById(userId)
+            if (posts) {
+                setPosts(posts);
             }
-            const data: Post[] = await response.json();
-            setPosts(data);
-            console.log("Fetched user posts:", data);
         } catch (err: any) {
             console.error('Error fetching user posts:', err);
             setPosts([]);
@@ -96,14 +94,8 @@ const UserProfilePage: React.FC<Props> = () => {
 
     const checkIfFollowing = async (followedId: string, followerId: string) => {
         try {
-            const response = await fetch(`/api/check-follow?followedId=${followedId}&followerId=${followerId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setIsFollowing(data.isFollowing);
-            } else {
-                console.error('Error checking follow status:', response.status);
-                setIsFollowing(false);
-            }
+            const followStatus = await getFollowStatus(user?.id!!)
+            setIsFollowing(followStatus);
         } catch (error) {
             console.error('Error checking follow status:', error);
             setIsFollowing(false);
@@ -140,7 +132,6 @@ const UserProfilePage: React.FC<Props> = () => {
     if (!user) {
         return <div>User not found.</div>;
     }
-
     return (
         <div>
             {/* Header Section */}
@@ -205,7 +196,7 @@ const UserProfilePage: React.FC<Props> = () => {
             <div className="space-y-4 p-4">
                 {activeTab === 'Posts' && posts.length > 0 ? (
                     posts.map((post) => (
-                        <MyPostsCard key={post.id} post={post} />
+                        <PostCard key={post.id} post={post} />
                     ))
                 ) : activeTab === 'Posts' ? (
                     <div className="border bg-trade-white rounded-lg p-4">
