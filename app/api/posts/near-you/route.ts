@@ -1,44 +1,42 @@
-// app/api/posts/near-you/route.ts
-import { sql } from "@vercel/postgres";
-import { NextRequest, NextResponse } from "next/server";
-import { getMe } from "@/lib/functions"; // Get the logged-in user with zip
+import { sql } from '@vercel/postgres';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const zipParams = searchParams.getAll('zips');
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = 15;
+  const offset = (page - 1) * limit;
+
+  if (!zipParams || zipParams.length === 0) {
+    return NextResponse.json({ error: 'Missing ZIP code(s)' }, { status: 400 });
+  }
+
   try {
-    const me = await getMe();
-
-    if (!me || !me.zip) {
-      return NextResponse.json({ error: "User ZIP not found" }, { status: 400 });
-    }
-
-    const userZip = me.zip;
-
-    // Define nearby zips here or dynamically based on a ZIP mapping
-    const nearbyZips = [userZip, "74103", "74104", "74105", "74106"]; // expand later
-
-    const placeholders = nearbyZips.map((_, i) => `$${i + 1}`).join(", ");
-    const values = [...nearbyZips];
-
+    const placeholders = zipParams.map((_, i) => `$${i + 1}`).join(', ');
     const query = `
       SELECT 
         posts.id,
         posts.text,
         posts.image,
         posts.timestamp,
-        posts.user,
-        posts.good,
-        users.zip
+        posts.type,
+        posts.user_id,
+        users.name AS user,
+        goods.name AS good
       FROM posts
       JOIN users ON posts.user_id = users.id
+      LEFT JOIN goods ON posts.good_id = goods.id
       WHERE users.zip IN (${placeholders})
       ORDER BY posts.timestamp DESC
-      LIMIT 20;
+      LIMIT ${limit}
+      OFFSET ${offset};
     `;
 
-    const { rows } = await sql.query(query, values);
+    const { rows } = await sql.query(query, zipParams);
     return NextResponse.json({ posts: rows });
   } catch (err) {
-    console.error("❌ Error fetching near-you posts:", err);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error('❌ Error fetching near-you posts:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

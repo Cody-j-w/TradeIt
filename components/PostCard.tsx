@@ -11,7 +11,7 @@ interface Post {
     text: string;
     image: string | null;
     type: string;
-    timestamp: Date;
+    timestamp: string;
 }
 
 interface User {
