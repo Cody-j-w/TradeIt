@@ -98,6 +98,18 @@ export async function fetchUsersByIds(userIds: string[]): Promise<{ [key: string
     }
 }
 
+export async function fetchPostsById(user_id: string) {
+    const posts = await db
+        .selectFrom("posts")
+        .innerJoin("users", "users.id", "posts.user_id")
+        .innerJoin("goods", "goods.id", "posts.good_id")
+        .select(['posts.id', 'users.id as user_id', 'users.name', 'goods.name', 'users.image', 'posts.text', 'posts.image', 'posts.type', 'posts.timestamp'])
+        .where("users.id", "=", user_id)
+        .execute();
+    console.log("Raw posts from database in fetchPosts:", posts);
+    return posts;
+}
+
 export async function fetchGood(goodName: string) {
     const fetchedGood = await db
         .selectFrom("goods")
@@ -338,6 +350,18 @@ export async function fetchFollows() {
     return followedUsers;
 }
 
+export async function fetchFollowStatus(user_id: string) {
+    const follower = await getSelf();
+    const fid = follower.id;
+    const follow = await db
+        .selectFrom("followings")
+        .select(["id"])
+        .where("user_id", "=", user_id)
+        .where("follower_id", "=", fid)
+        .execute()
+    return (follow.length > 0);
+}
+
 export async function fetchFollowedPosts() {
     const followedUsers = await fetchFollows();
     const fids = [];
@@ -363,6 +387,7 @@ export async function addFollow(userId: string, followerId: string) {
             follower_id: fid,
             timestamp: new Date()
         })
+        .returning(['id'])
         .executeTakeFirst();
     return newFollow;
 }
