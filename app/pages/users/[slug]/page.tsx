@@ -3,15 +3,16 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
-import { getUserBySlug, submitFollow } from '@/lib/functions';
+import { getFollowStatus, getPostsById, getUserBySlug, submitFollow } from '@/lib/functions';
 import { useTransition } from 'react';
 import MyPostsCard from '@/components/MyPostsCard';
 import React from 'react';
 
 // Placeholder for profile picture
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
+import PostCard from '@/components/PostCard';
 
 interface User {
     id: string;
@@ -34,8 +35,7 @@ interface Props {
     params: { slug: string };
 }
 
-const UserProfilePage: React.FC<Props> = ({ params }) => {
-    const { slug } = params; // Access slug directly
+const UserProfilePage: React.FC<Props> = () => {
     const router = useRouter();
     const { user: auth0User } = useUser();
     const [activeTab, setActiveTab] = useState('Posts');
@@ -46,18 +46,19 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [isFollowPending, startFollowTransition] = useTransition();
 
+    const params = useParams<{ slug: string }>();
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchUserData: () => Promise<void> = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const fetchedUser = await getUserBySlug(slug);
+                const fetchedUser = await getUserBySlug(params.slug);
                 if (fetchedUser) {
                     setUser({
                         id: fetchedUser.id,
                         name: fetchedUser.name,
                         image: fetchedUser.avatar,
-                        slug: slug,
+                        slug: params.slug,
                         bio: fetchedUser.bio,
                     });
                     fetchUserPosts(fetchedUser.id);
@@ -77,17 +78,14 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
         };
 
         fetchUserData();
-    }, [slug, auth0User?.sub]);
+    }, [params.slug, auth0User?.sub]);
 
     const fetchUserPosts = async (userId: string) => {
         try {
-            const response = await fetch(`/api/users/${userId}/posts`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+            const posts = await getPostsById(userId)
+            if (posts) {
+                setPosts(posts);
             }
-            const data: Post[] = await response.json();
-            setPosts(data);
-            console.log("Fetched user posts:", data);
         } catch (err: any) {
             console.error('Error fetching user posts:', err);
             setPosts([]);
@@ -96,14 +94,8 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
 
     const checkIfFollowing = async (followedId: string, followerId: string) => {
         try {
-            const response = await fetch(`/api/check-follow?followedId=${followedId}&followerId=${followerId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setIsFollowing(data.isFollowing);
-            } else {
-                console.error('Error checking follow status:', response.status);
-                setIsFollowing(false);
-            }
+            const followStatus = await getFollowStatus(user?.id!!)
+            setIsFollowing(followStatus);
         } catch (error) {
             console.error('Error checking follow status:', error);
             setIsFollowing(false);
@@ -140,7 +132,6 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
     if (!user) {
         return <div>User not found.</div>;
     }
-
     return (
         <div>
             {/* Header Section */}
@@ -169,9 +160,8 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
                         <button
                             onClick={onFollowToggle}
                             disabled={isFollowPending}
-                            className={`bg-blue-500 text-white px-3 py-2 rounded-md ${
-                                isFollowing ? 'bg-gray-500' : ''
-                            } ${isFollowPending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`bg-blue-500 text-white px-3 py-2 rounded-md ${isFollowing ? 'bg-gray-500' : ''
+                                } ${isFollowPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isFollowPending ? 'Following...' : isFollowing ? 'Unfollow' : 'Follow'}
                         </button>
@@ -206,7 +196,7 @@ const UserProfilePage: React.FC<Props> = ({ params }) => {
             <div className="space-y-4 p-4">
                 {activeTab === 'Posts' && posts.length > 0 ? (
                     posts.map((post) => (
-                        <MyPostsCard key={post.id} post={post} />
+                        <PostCard key={post.id} post={post} />
                     ))
                 ) : activeTab === 'Posts' ? (
                     <div className="border bg-trade-white rounded-lg p-4">
