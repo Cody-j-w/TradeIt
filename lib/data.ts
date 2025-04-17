@@ -440,7 +440,7 @@ export async function updateZipById(zip: string, userId: string) {
 export async function fetchUserBySlug(slug: string) {
     const user = await db
         .selectFrom("users")
-        .select(['id', 'name', 'image', 'slug'])
+        .select(['id', 'name', 'image', 'bio', 'slug'])
         .where('slug', '=', slug)
         .executeTakeFirst();
     return user;
