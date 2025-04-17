@@ -53,16 +53,17 @@ export async function getAllUsers() {
 }
 
 
-export async function getUsersById(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; avatar: string } }> {
+export async function getUsersById(userIds: string[]): Promise<{ [key: string]: { id: string; name: string; avatar: string; slug: string } }> {
     try {
         const usersData = await fetchUsersByIds(userIds);
-        const formattedUsers: { [key: string]: { id: string; name: string; avatar: string } } = {};
+        const formattedUsers: { [key: string]: { id: string; name: string; avatar: string; slug: string } } = {};
         for (const id in usersData) {
             if (usersData.hasOwnProperty(id)) {
                 formattedUsers[id] = {
                     id: usersData[id].id,
                     name: usersData[id].name,
                     avatar: usersData[id].image,
+                    slug: usersData[id].slug
                 };
             }
         }

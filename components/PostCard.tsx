@@ -18,6 +18,7 @@ interface User {
     id: string;
     name: string;
     avatar: string;
+    slug: string;
 }
 
 interface PostCardProps {
@@ -41,6 +42,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                         id: usersData[post.user_id].id,
                         name: usersData[post.user_id].name,
                         avatar: usersData[post.user_id].avatar,
+                        slug: usersData[post.user_id].slug
                     });
                 } else {
                     setErrorUser('Could not load user information.');
@@ -79,7 +81,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         <div className="bg-white rounded-lg shadow-md p-4 mb-4 dark:bg-trade-gray">
             <div className="flex items-center mb-2">
                 <img src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full mr-2" />
-                <div className="font-semibold">{user.name}</div>
+                <div className="font-semibold"><a href={`users/${user.slug}`}>{user.name}</a></div>
             </div>
 
             {post.image && (
