@@ -3,17 +3,25 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const zipParams = searchParams.getAll('zips');
+  const zipParam = searchParams.get('zips');
   const page = parseInt(searchParams.get('page') || '1');
-  const limit = 15;
+  const limit = 10;
   const offset = (page - 1) * limit;
 
-  if (!zipParams || zipParams.length === 0) {
-    return NextResponse.json({ error: 'Missing ZIP code(s)' }, { status: 400 });
+  if (!zipParam) {
+    return NextResponse.json({ error: 'Missing zips param' }, { status: 400 });
   }
 
+  let zips: string[];
   try {
-    const placeholders = zipParams.map((_, i) => `$${i + 1}`).join(', ');
+    zips = JSON.parse(zipParam); // properly parses ["74104", "74103", ...]
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid zips format' }, { status: 400 });
+  }
+
+  const placeholders = zips.map((_, i) => `$${i + 1}`).join(', ');
+
+  try {
     const query = `
       SELECT 
         posts.id,
@@ -30,13 +38,13 @@ export async function GET(req: NextRequest) {
       WHERE users.zip IN (${placeholders})
       ORDER BY posts.timestamp DESC
       LIMIT ${limit}
-      OFFSET ${offset};
+      OFFSET ${offset}
     `;
+    const { rows } = await sql.query(query, zips);
 
-    const { rows } = await sql.query(query, zipParams);
     return NextResponse.json({ posts: rows });
   } catch (err) {
-    console.error('❌ Error fetching near-you posts:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('❌ Failed to fetch near-you posts:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

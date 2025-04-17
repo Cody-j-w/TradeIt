@@ -9,64 +9,36 @@ interface Post {
   text: string;
   image: string | null;
   type: string;
-  timestamp: string; // from server
+  timestamp: string; // keep this as string
 }
 
 interface NearYouPostsProps {
   zips: string[];
 }
 
-const NearYouPosts: React.FC<NearYouPostsProps> = ({ zips }) => {
+const NearYouPosts = ({ zips }: NearYouPostsProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
-  const fetchPosts = async () => {
-    if (loading || !hasMore) return;
-
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      zips.forEach(zip => params.append('zips', zip));
-      params.set('page', page.toString());
-
-      const res = await fetch(`/api/posts/near-you?${params.toString()}`);
-      const data = await res.json();
-
-      if (data?.posts?.length > 0) {
-        const uniquePosts = data.posts.filter((p: Post) => !posts.some(existing => existing.id === p.id));
-        setPosts(prev => [...prev, ...uniquePosts]);
-        setPage(prev => prev + 1);
-        if (uniquePosts.length < 15) setHasMore(false);
-      } else {
-        setHasMore(false);
-      }
-    } catch (err) {
-      console.error('Error fetching posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
-        !loading &&
-        hasMore
-      ) {
-        fetchPosts();
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const zipQuery = encodeURIComponent(JSON.stringify(zips));
+        const res = await fetch(`/api/posts/near-you?zips=${zipQuery}&page=1`);
+        const data = await res.json();
+        if (data?.posts) {
+          setPosts(data.posts);
+        }
+      } catch (err) {
+        console.error('Error fetching near-you posts:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [loading, hasMore]);
+    fetchPosts();
+  }, [zips]);
 
   return (
     <div className="space-y-4">
@@ -75,12 +47,14 @@ const NearYouPosts: React.FC<NearYouPostsProps> = ({ zips }) => {
           key={post.id}
           post={{
             ...post,
-            timestamp: post.timestamp,
+            timestamp: post.timestamp, // PostCard expects Date
           }}
         />
       ))}
-      {loading && <p className="text-center text-gray-600">Loading more posts...</p>}
-      {!hasMore && posts.length > 0 && <p className="text-center text-gray-500">No more posts.</p>}
+      {loading && <p>Loading posts...</p>}
+      {!loading && posts.length === 0 && (
+        <p className="text-gray-600">No posts found for nearby ZIPs.</p>
+      )}
     </div>
   );
 };
