@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import LikeButton from './LikeButton';
 import { getUsersById } from '@/lib/functions';
+import Link from 'next/link';
 
 interface Post {
   id: string;
@@ -75,7 +76,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const formattedTime = parsedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+    <div className="bg-white dark:bg-trade-gray rounded-lg shadow-md p-4 mb-4">
       <div className="flex items-center mb-2 justify-between">
         <div className="flex items-center">
           <img
@@ -86,10 +87,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             className="rounded-full mr-2"
           />
           <div className="font-semibold">
-            <a href={`/users/${user.slug}`} className="hover:underline">{user.name}</a>
-          </div>
+                        <Link href={`/pages/users/${user.slug}`} className="hover:underline text-black dark:text-white">
+                            {user.name}
+                        </Link>
+                    </div>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-trade-orange">
           {formattedDate} {formattedTime}
         </div>
       </div>

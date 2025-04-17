@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import NearYouPosts from '@/components/NearYouPosts';
+import FollowingPosts from '@/components/FollowingPosts';
 import { getMe } from '@/lib/functions';
 import { zipRadiusLookup } from '@/lib/geo';
+import PostCard from '@/components/PostCard';
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState('Following');
@@ -33,7 +35,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="flex justify-center bg-gray-300 text-trade-gray">
+      <div className="flex fixed w-full justify-center bg-gray-300 text-trade-gray dark:bg-trade-gray dark:text-trade-orange">
         {['Following', 'Suggested', 'Near You'].map(tab => (
           <button
             key={tab}
@@ -45,8 +47,8 @@ const Home = () => {
         ))}
       </div>
 
-      <div className="p-4">
-        {activeTab === 'Following' && <div>Following content goes here.</div>}
+      <div className="p-4 pt-15 pb-23">
+        {activeTab === 'Following' && (<FollowingPosts />)}
         {activeTab === 'Suggested' && <div>Suggested content goes here.</div>}
         {activeTab === 'Near You' && (
           loading ? (
