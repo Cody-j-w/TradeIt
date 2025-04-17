@@ -238,6 +238,9 @@ export async function insertPost(user: string, postText: string, goodName: strin
 
     const newPost = postGood !== null ? await createPost(postText, user, postGood?.id!!, type, image) : await createBlog(postText, user, image);
 
+    if (postGood && (type === 'UTF' || type === 'ISO')) {
+        await createTrader(user, postGood?.id)
+    }
     const relations = [];
     if (tagInsert !== null) {
         for (const tag of tagInsert) {
