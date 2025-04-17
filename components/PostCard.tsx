@@ -10,13 +10,14 @@ interface Post {
   text: string;
   image: string | null;
   type: string;
-  timestamp: string; // string from the API
+  timestamp: string; // ISO string from the API
 }
 
 interface User {
   id: string;
   name: string;
   avatar: string;
+  slug: string;
 }
 
 interface PostCardProps {
@@ -41,6 +42,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             id: usersData[post.user_id].id,
             name: usersData[post.user_id].name,
             avatar: usersData[post.user_id].avatar,
+            slug: usersData[post.user_id].slug,
           });
         } else {
           setErrorUser('Could not load user information.');
@@ -83,7 +85,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             height={40}
             className="rounded-full mr-2"
           />
-          <div className="font-semibold">{user.name}</div>
+          <div className="font-semibold">
+            <a href={`/users/${user.slug}`} className="hover:underline">{user.name}</a>
+          </div>
         </div>
         <div className="text-sm text-gray-500">
           {formattedDate} {formattedTime}
