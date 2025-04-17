@@ -7,7 +7,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
 import { getFollowStatus, getPostsById, getUserBySlug, submitFollow } from '@/lib/functions';
 import { useTransition } from 'react';
-import MyPostsCard from '@/components/MyPostsCard';
 import React from 'react';
 
 // Placeholder for profile picture
@@ -177,7 +176,7 @@ const UserProfilePage: React.FC<Props> = () => {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex justify-around bg-gray-300 text-trade-gray fixed w-full top-30">
+            <div className="flex justify-around bg-gray-300 text-trade-gray dark:bg-trade-gray dark:text-trade-orange fixed w-full top-30">
                 <button
                     className={`px-4 py-2 ${activeTab === 'Posts' ? 'border-b-3 border-trade-blue' : ''}`}
                     onClick={() => handleTabClick('Posts')}
