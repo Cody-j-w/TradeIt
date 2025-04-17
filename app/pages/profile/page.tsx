@@ -1,16 +1,17 @@
-// app/pages/profile
+// app/pages/profile/page.tsx
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0';
-import { getUser } from '@/lib/functions';
+import { getUser, submitZip } from '@/lib/functions';
 import LogoutButton from '@/components/LogoutButton';
-import MyPostsCard from '@/components/MyPostsCard'; // Import the MyPostsCard component
+import MyPostsCard from '@/components/MyPostsCard';
 import { getMyPosts } from '@/lib/functions';
+import { useTransition } from 'react'; // For pending UI
 
-// Placeholder for profile picture
+// Placeholder assets
 import ProfilePicPlaceholder from '@/assets/profile-placeholder.png';
 import PencilIcon from '@/assets/pencil.png';
 import SettingsIcon from '@/assets/settings.svg';
@@ -42,30 +43,32 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [posts, setPosts] = useState<Post[]>([]); // State to hold the user's posts
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [zipCode, setZipCode] = useState(''); // State for zip code input
+  const [isZipFormPending, startZipTransition] = useTransition();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         if (auth0User?.email) {
           const fetchedUser = await getUser(auth0User.email);
-          console.log("Fetched User:", fetchedUser);
+          console.log('Fetched User:', fetchedUser);
           if (fetchedUser) {
             setUser(fetchedUser);
             setProfilePic(fetchedUser.image);
             const myPosts = await getMyPosts();
             if (myPosts) {
               console.log(myPosts);
-              setPosts(myPosts)
+              setPosts(myPosts);
             }
           } else {
             setUser(null);
           }
         }
         console.log(posts);
-      } catch (error: any) {
-        console.error('Error fetching user data:', error);
-        setUser(null); // Handle error case, ensure null is set
+      } catch (err: any) {
+        console.error('Error fetching user data:', err);
+        setUser(null);
       }
     };
 
@@ -80,7 +83,9 @@ const Profile = () => {
     setIsEditingDescription(true);
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setDescription(e.target.value);
   };
 
@@ -102,12 +107,14 @@ const Profile = () => {
 
         console.log('Description saved:', description);
       }
-    } catch (error: any) {
-      console.error('Error saving description:', error);
+    } catch (err: any) {
+      console.error('Error saving description:', err);
     }
   };
 
-  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePicChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -127,6 +134,28 @@ const Profile = () => {
     setIsSettingsOpen(!isSettingsOpen);
   };
 
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setZipCode(e.target.value);
+  };
+
+  const handleZipCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (zipCode) {
+      startZipTransition(async () => {
+        const formData = new FormData();
+        formData.append('zip', zipCode);
+        const result = await submitZip(formData);
+        if (result) {
+          console.log('Zip code updated successfully:', result);
+          // Optionally, provide user feedback (e.g., a success message)
+        } else {
+          console.error('Failed to update zip code.');
+          // Optionally, provide user feedback (e.g., an error message)
+        }
+      });
+    }
+  };
+
   if (isLoading) {
     return <div>Loading profile...</div>;
   }
@@ -142,7 +171,7 @@ const Profile = () => {
   return (
     <div>
       {/* Header Section */}
-      <div className="flex flex-col bg-trade-orange dark:bg-trade-green p-4 fixed w-full">
+      <div className="flex flex-col bg-trade-orange dark:bg-trade-green z-50 p-4 sticky top-0 w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="relative">
@@ -153,7 +182,8 @@ const Profile = () => {
                 height={60}
                 className="rounded-full mr-4"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = ProfilePicPlaceholder.src; // Fallback if user image fails to load
+                  (e.target as HTMLImageElement).src =
+                    ProfilePicPlaceholder.src;
                 }}
               />
               <button
@@ -172,24 +202,64 @@ const Profile = () => {
             </div>
             <div>
               <h2 className="text-lg font-semibold">{user.name}</h2>
-              <p className="text-sm text-gray-500 dark:text-amber-400">{user.slug}</p>
+              <p className="text-sm text-gray-500 dark:text-amber-400">
+                {user.slug}
+              </p>
             </div>
           </div>
           {/* Settings Button */}
           <div className="relative">
-            <button onClick={toggleSettings} className="rounded-full  p-2 bg-trade-white dark:bg-trade-orange">
+            <button
+              onClick={toggleSettings}
+              className="rounded-full p-2 bg-trade-white dark:bg-trade-orange"
+            >
               <Image src={SettingsIcon} alt="Settings" className="h-5 w-5" />
             </button>
             {isSettingsOpen && (
-              <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
-                  <a href="/account/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                    Account Settings
-                  </a>
-                  <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                    <LogoutButton />
-                  </div>
+              <div
+                className="absolute right-0 z-50 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="options-menu-button"
+              >
+                <a
+                  href="/account/settings"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  role="menuitem"
+                >
+                  Account Settings
+                </a>
+                <div
+                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  role="menuitem"
+                >
+                  <LogoutButton />
                 </div>
+                {/* Zip Code Form */}
+                <form onSubmit={handleZipCodeSubmit} className="px-4 py-2">
+                  <label
+                    htmlFor="zip-code"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Update Zip Code:
+                  </label>
+                  <input
+                    type="text"
+                    id="zip-code"
+                    value={zipCode}
+                    onChange={handleZipCodeChange}
+                    maxLength={10} // Adjust as needed
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="Enter zip code"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isZipFormPending}
+                    className="mt-2 inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    {isZipFormPending ? 'Updating...' : 'Update Zip'}
+                  </button>
+                </form>
               </div>
             )}
           </div>
@@ -215,7 +285,10 @@ const Profile = () => {
             </div>
           ) : (
             <div className="flex items-center w-full">
-              <button onClick={handleEditDescription} className="text-gray-500 mr-2">
+              <button
+                onClick={handleEditDescription}
+                className="text-gray-500 mr-2"
+              >
                 <Image src={PencilIcon} alt="Edit" className="h-4 w-4" />
               </button>
               <p className="text-sm text-gray-600">
@@ -227,15 +300,19 @@ const Profile = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex justify-around bg-gray-300 text-trade-gray dark:bg-trade-gray dark:text-trade-orange fixed w-full top-30">
+      <div className="flex sticky z-30 justify-around bg-gray-300 text-trade-gray dark:bg-trade-gray dark:text-trade-orange w-full top-30">
         <button
-          className={`px-4 py-2 ${activeTab === 'Posts' ? 'border-b-3 border-trade-blue' : ''}`}
+          className={`px-4 py-2 ${
+            activeTab === 'Posts' ? 'border-b-3 border-trade-blue' : ''
+          }`}
           onClick={() => handleTabClick('Posts')}
         >
           Posts
         </button>
         <button
-          className={`px-4 py-2 ${activeTab === 'Trades' ? 'border-b-3 border-trade-blue' : ''}`}
+          className={`px-4 py-2 ${
+            activeTab === 'Trades' ? 'border-b-3 border-trade-blue' : ''
+          }`}
           onClick={() => handleTabClick('Trades')}
         >
           Trades
@@ -243,11 +320,9 @@ const Profile = () => {
       </div>
 
       {/* Post/Trade Items */}
-      <div className="space-y-4 p-4 pt-45 pb-25">
+      <div className="space-y-4 p-4 pb-23">
         {activeTab === 'Posts' && posts.length > 0 ? (
-          posts.map((post) => (
-            <MyPostsCard key={post.id} post={post} />
-          ))
+          posts.map((post) => <MyPostsCard key={post.id} post={post} />)
         ) : activeTab === 'Posts' ? (
           <div className="border bg-trade-white rounded-lg p-4">
             <p className="text-gray-600">No posts yet.</p>

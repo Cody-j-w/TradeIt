@@ -31,8 +31,8 @@ const AddNewButton: React.FC<AddNewButtonProps> = ({ onOpenBlogModal, onOpenTrad
           onOpenPostModal(); // Call the passed function
           setIsExpanded(false);
         }}
-        className={`fixed bottom-24 right-5 z-40 flex items-center justify-center p-2 rounded-full shadow-md transition duration-300 ease-out ${
-          isExpanded ? 'opacity-100 scale-100 visible translate-x-[-145px]' : 'opacity-0 scale-0 invisible translate-x-0'
+        className={`fixed bottom-26 right-5 z-40 flex items-center justify-center p-2 rounded-full shadow-md transition duration-300 ease-out ${
+          isExpanded ? 'opacity-100 scale-100 visible translate-x-[-190px]' : 'opacity-0 scale-0 invisible translate-x-0'
         } bg-trade-orange origin-center`}
       >
         <Image src={addPostIcon} alt="Add Post" width={20} height={20} />
@@ -44,8 +44,8 @@ const AddNewButton: React.FC<AddNewButtonProps> = ({ onOpenBlogModal, onOpenTrad
           onOpenTradeModal();
           setIsExpanded(false);
         }}
-        className={`fixed bottom-24 right-5 z-40 flex items-center justify-center p-2 rounded-full shadow-md transition duration-300 ease-out ${
-          isExpanded ? 'opacity-100 scale-100 visible translate-x-[-100px]' : 'opacity-0 scale-0 invisible translate-x-0'
+        className={`fixed bottom-26 right-5 z-40 flex items-center justify-center p-2 rounded-full shadow-md transition duration-300 ease-out ${
+          isExpanded ? 'opacity-100 scale-100 visible translate-x-[-145px]' : 'opacity-0 scale-0 invisible translate-x-0'
         } bg-trade-orange origin-center`}
       >
         <Image src={addTradeIcon} alt="Add Trade" width={20} height={20} />
@@ -57,8 +57,8 @@ const AddNewButton: React.FC<AddNewButtonProps> = ({ onOpenBlogModal, onOpenTrad
           onOpenBlogModal();
           setIsExpanded(false);
         }}
-        className={`fixed bottom-24 right-5 z-40 flex items-center justify-center p-2 rounded-full shadow-md transition duration-300 ease-out ${
-          isExpanded ? 'opacity-100 scale-100 visible translate-x-[-55px]' : 'opacity-0 scale-0 invisible translate-x-0'
+        className={`fixed bottom-26 right-5 z-40 flex items-center justify-center p-2 rounded-full shadow-md transition duration-300 ease-out ${
+          isExpanded ? 'opacity-100 scale-100 visible translate-x-[-100px]' : 'opacity-0 scale-0 invisible translate-x-0'
         } bg-trade-orange origin-center`}
       >
         <Image src={addBlogIcon} alt="Add Blog" width={20} height={20} />
@@ -67,7 +67,7 @@ const AddNewButton: React.FC<AddNewButtonProps> = ({ onOpenBlogModal, onOpenTrad
       {/* Main Button */}
       <button
         onClick={toggleExpand}
-        className="fixed bottom-24 right-5 z-40 flex items-center justify-center p-3 rounded-full shadow-lg bg-trade-orange text-trade-white origin-center"
+        className="fixed bottom-26 right-15 z-40 flex items-center justify-center p-3 rounded-full shadow-lg bg-trade-orange text-trade-white origin-center"
       >
         <Image src={addNew} alt="Add New" width={24} height={24} />
       </button>
