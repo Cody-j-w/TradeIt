@@ -19,11 +19,14 @@ def hello_fast_api():
 # I genuinely have no idea what I'm doing but I think it is that simple.
 @app.get("/api/py/recommendations/{user_id}", response_model=List[PostRecommendation])
 def fetch_recommendations(user_id):
-    print("API call made it through for user ID:")
-    print(user_id)
-    recommended_posts = get_recommendations(user_id)
+    try:
+        print("API call made it through for user ID:")
+        print(user_id)
+        recommended_posts = get_recommendations(user_id)
 
-    return recommended_posts
+        return recommended_posts
+    except:
+        print("Issue with server")
 
 # Still no idea what I'm doing but we're gonna give it our best.
 @app.get("/api/py/test_json")
