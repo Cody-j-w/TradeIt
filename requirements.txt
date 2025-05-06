@@ -3,4 +3,5 @@ uvicorn[standard]==0.34.0
 numpy==2.0.0
 psycopg2-binary==2.9.10
 pydantic==2.11.3
+python-dotenv==1.1.0
 # sentence_transformers==3.4.1

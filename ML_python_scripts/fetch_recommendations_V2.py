@@ -14,6 +14,7 @@ from pydantic import BaseModel
 import psycopg2
 
 import os
+from dotenv import main
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
@@ -22,12 +23,25 @@ import random
 from .cosine_similarity import recommend_cosine_sim
 from .data_fetchers import *
 
+main.load_dotenv()
 app = FastAPI()
 
 # Connecting to database
 def get_db_connection():
-    conn = psycopg2.connect(os.getenv("POSTGRES_URL"))
-    return conn
+    db_url = os.getenv("POSTGRES_URL")
+    if not db_url:
+        raise ValueError(f"Not da db. Da db: {db_url}")
+
+    print(f"Attempting to connect to database url")
+
+    try:
+        conn = psycopg2.connect(db_url)
+        return conn
+    except Exception as e:
+        print(f"failed to connect to database: {e}")
+        raise
+    # conn = psycopg2.connect(os.getenv("POSTGRES_URL"))
+    # return conn
 
 # All of these will be changed when I see what the API calls look like
 # These are for JSONifying the data to be returned in an API call later.
