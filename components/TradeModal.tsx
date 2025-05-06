@@ -2,12 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-// If you have a separate file for your shared User interface (e.g., src/types/user.ts),
-// import it here:
-// import { User } from '@/src/types/user'; 
-
-// If you DON'T have a separate file, define the User interface here, 
-// but make sure it's EXACTLY the same as the one in AddNewWrapper:
 interface User {
   id: string; // Changed to string to match UsersTable's id
   name: string;
