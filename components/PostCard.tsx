@@ -39,6 +39,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       try {
         const usersData = await getUsersById([post.user_id]);
         if (usersData && usersData[post.user_id]) {
+          console.log(usersData);
           setUser({
             id: usersData[post.user_id].id,
             name: usersData[post.user_id].name,
@@ -46,7 +47,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             slug: usersData[post.user_id].slug,
           });
         } else {
-          setErrorUser('Could not load user information.');
+          console.log(usersData);
+          setErrorUser(`Could not load user information for user ${post.user_id}`);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -87,10 +89,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             className="rounded-full mr-2"
           />
           <div className="font-semibold">
-                        <Link href={`/pages/users/${user.slug}`} className="hover:underline text-black dark:text-white">
-                            {user.name}
-                        </Link>
-                    </div>
+            <Link href={`/pages/users/${user.slug}`} className="hover:underline text-black dark:text-white">
+              {user.name}
+            </Link>
+          </div>
         </div>
         <div className="text-sm text-gray-500 dark:text-trade-orange">
           {formattedDate} {formattedTime}
