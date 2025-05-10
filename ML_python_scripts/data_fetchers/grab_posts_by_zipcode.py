@@ -36,14 +36,15 @@ def get_recent_posts_by_zipcode(user_id, conn, limit: int = 5) -> Optional[list[
     # try:
     cursor = conn.cursor()
     cursor.execute('''
-                    SELECT posts.id
+                    SELECT posts.id, posts.user_id
                     FROM posts
                     JOIN users on posts.user_id = users.id
                     WHERE users.zip = %s
                     AND posts.timestamp >= %s::date
+                    AND posts.user_id != %s::uuid
                     ORDER BY posts.timestamp DESC
                     LIMIT %s;
-                    ''', (user_zip_code, one_week_ago, limit))
+                    ''', (user_zip_code, one_week_ago, user_id, limit))
     results = cursor.fetchall()
     post_ids = [row[0] for row in results]
     return post_ids

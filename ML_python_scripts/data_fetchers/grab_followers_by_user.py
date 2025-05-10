@@ -17,10 +17,11 @@ def get_recent_followers_by_user(user_id: int, conn: psycopg2.extensions.connect
         with conn.cursor() as con:
             with con.cursor() as cursor:
                 cursor.execute('''
-                               SELECT posts.id
+                               SELECT posts.id, posts.user_id
                                FROM posts
                                JOIN followings ON posts.user_id = followings.user_id
                                WHERE followings.user_id = %s
+                               AND posts.user_id != %s
                                ORDER BY posts.timestamp DESC
                                LIMIT %s;
                                ''', (user_id, limit))

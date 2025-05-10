@@ -55,9 +55,11 @@ def recommend_cosine_sim(user_id, conn):
         ) -- getting posts the user hasn't already liked
         AND p.embedding IS NOT NULL
         -- this is where I'd include datetime limits I think. Only recommend recent posts, you know?
+        AND p.user_id != %s::uuid
+        -- ^^This is the new line added for removing posts that were created by the user.
         ORDER BY similarity DESC
         LIMIT 10
-    """, (user_id, user_id))
+    """, (user_id, user_id, user_id))
     recommended_posts = cursor.fetchall()
 
     post_id_list = [post[0] for post in recommended_posts]

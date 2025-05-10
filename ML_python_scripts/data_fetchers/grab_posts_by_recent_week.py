@@ -12,9 +12,10 @@ def get_recent_posts_by_week(user_id, conn, limit: int = 2) -> Optional[List[int
                     SELECT id, user_id, timestamp
                     FROM posts
                     WHERE timestamp >= %s
+                    AND user_id != %s::uuid
                     ORDER BY timestamp DESC
                     LIMIT %s;
-                    ''', (one_week_ago.date(), limit))
+                    ''', (one_week_ago.date(), user_id, limit))
     results = cursor.fetchall()
     user_ids = [row[0] for row in results]
     return user_ids

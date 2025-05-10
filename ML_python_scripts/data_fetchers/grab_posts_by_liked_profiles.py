@@ -13,9 +13,10 @@ def get_recent_posts_by_liked_profiles(user_id, conn, limit: int = 5) -> Optiona
                     FROM posts
                     JOIN posts_likes ON posts.id = posts_likes.post_id
                     WHERE posts_likes.user_id = %s
+                    AND posts.user_id != %s
                     ORDER BY posts.timestamp DESC
                     LIMIT %s
-                    ''', (user_id, limit))
+                    ''', (user_id, user_id, limit))
     results = cursor.fetchall()
     user_ids = [row[0] for row in results]
     return user_ids
