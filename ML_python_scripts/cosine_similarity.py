@@ -28,6 +28,11 @@ def recommend_cosine_sim(user_id, conn):
     # ACE
     # MAKE SURE YOU ONLY PULL POSTS WITH EMBEDDINGS
     # OTHERWISE THINGS MAY BREAK
+    #   HEY PAST ACE
+    #   STOP SCREAMING AT ME
+    #   I DID IT
+    #   IN FACT YOU DID IT MINUTES AFTER TYPING THIS
+    #   I WOULD KNOW, I WAS THERE
     cursor = conn.cursor()
 
     cursor.execute("""
