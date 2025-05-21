@@ -7,13 +7,22 @@ import RecPostCard from '@/components/RecPostCard'; // Import the new component
 import { getMe } from '@/lib/functions';
 import { zipRadiusLookup } from '@/lib/geo';
 
+interface PostRecommendationUser {
+    id: string;
+    name: string;
+    avatar: string; // Or 'image' if that's what your API sends directly for the user's avatar in the nested object
+    slug: string;
+    user_id: string;
+}
+
 interface PostRecommendation {
     id: string;
-    user_id: string;
+    // user_id: string; // REMOVE THIS LINE
     text: string;
     image: string | null;
     type: string;
     timestamp: string;
+    user: PostRecommendationUser; // ADD THIS LINE
 }
 
 const Home = () => {

@@ -5,13 +5,22 @@ import LikeButton from './LikeButton';
 import { getUsersById } from '@/lib/functions';
 import Link from 'next/link';
 
+interface PostRecommendationUser {
+    id: string;
+    name: string;
+    avatar: string;
+    slug: string;
+    user_id: string;
+}
+
+
 interface PostRecommendation {
     id: string;
-    user_id: string;
     text: string;
     image: string | null;
     type: string;
     timestamp: string;
+    user: PostRecommendationUser;
 }
 
 interface User {
@@ -37,28 +46,32 @@ const RecPostCard: React.FC<RecPostCardProps> = ({ post }) => {
             setLoadingUser(true);
             setErrorUser(null);
 
-            // Ensure post.user_id is valid before proceeding
-            if (!post.user_id) {
-                console.error("RecPostCard: post.user_id is undefined or null for post:", post);
-                setErrorUser("Cannot load user: Post ID is missing a user reference.");
+            
+            const userIdToFetch = post.user?.user_id;
+
+            // CRITICAL CHECK: Ensure userIdToFetch is valid before proceeding
+            if (!userIdToFetch) {
+                console.error("RecPostCard: post.user.user_id is undefined or null for post:", post);
+                setErrorUser("Cannot load user: Post's user reference is missing.");
                 setLoadingUser(false);
-                return; // Stop execution if user_id is missing
+                return;
             }
 
             try {
-                const usersData = await getUsersById([post.user_id]);
-                if (usersData && usersData[post.user_id]) {
+                const usersData = await getUsersById([userIdToFetch]);
+
+                if (usersData && usersData[userIdToFetch]) {
                     setUser({
-                        id: usersData[post.user_id].id,
-                        name: usersData[post.user_id].name,
-                        avatar: usersData[post.user_id].avatar,
-                        slug: usersData[post.user_id].slug,
+                        id: usersData[userIdToFetch].id,
+                        name: usersData[userIdToFetch].name,
+                        avatar: usersData[userIdToFetch].avatar,
+                        slug: usersData[userIdToFetch].slug,
                     });
                 } else {
-                    setErrorUser(`Could not load user information for user ${post.user_id}. User not found.`);
+                    setErrorUser(`Could not load user information for user ${userIdToFetch}. User not found or data incomplete.`);
                 }
             } catch (error) {
-                console.error("Error fetching user for post:", post.id, error);
+                console.error("Error fetching user for post ID:", post.id, "Error:", error);
                 setErrorUser('Failed to fetch user information due to an internal error.');
             } finally {
                 setLoadingUser(false);
@@ -66,7 +79,7 @@ const RecPostCard: React.FC<RecPostCardProps> = ({ post }) => {
         };
 
         fetchUser();
-    }, [post.user_id]);
+    }, [post.user?.user_id]); // DEPENDENCY ARRAY CHANGE: Watch the nested user_id
 
     const handleLikeChange = (newLikeState: boolean) => {
         setIsLiked(newLikeState);
@@ -78,8 +91,8 @@ const RecPostCard: React.FC<RecPostCardProps> = ({ post }) => {
 
     // Render loading/error states for user data first
     if (loadingUser) return <div>Loading user for post...</div>;
-    if (errorUser) return <div className="text-red-500">Error loading user: {errorUser}</div>; // Make error more visible
-    if (!user) return null; // If user is null but not loading or error, it means we tried to load but found nothing
+    if (errorUser) return <div className="text-red-500">Error loading user: {errorUser}</div>;
+    if (!user) return null; // If user is null but not loading or error, something went wrong after loading
 
     const parsedDate = new Date(post.timestamp);
     const formattedDate = parsedDate.toLocaleDateString();
