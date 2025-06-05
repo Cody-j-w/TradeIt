@@ -3,17 +3,26 @@
 import React, { useEffect, useState } from 'react';
 import NearYouPosts from '@/components/NearYouPosts';
 import FollowingPosts from '@/components/FollowingPosts';
-import PostCard from '@/components/PostCard';
+import RecPostCard from '@/components/RecPostCard'; // Import the new component
 import { getMe } from '@/lib/functions';
 import { zipRadiusLookup } from '@/lib/geo';
 
+interface PostRecommendationUser {
+    id: string;
+    name: string;
+    avatar: string; // Or 'image' if that's what your API sends directly for the user's avatar in the nested object
+    slug: string;
+    user_id: string;
+}
+
 interface PostRecommendation {
     id: string;
-    user_id: string;
+    // user_id: string; // REMOVE THIS LINE
     text: string;
     image: string | null;
     type: string;
     timestamp: string;
+    user: PostRecommendationUser; // ADD THIS LINE
 }
 
 const Home = () => {
@@ -103,7 +112,7 @@ const Home = () => {
                     ) : errorSuggested ? (
                         <div>Error: {errorSuggested}</div>
                     ) : suggestedPosts.length > 0 ? (
-                        suggestedPosts.map(post => <PostCard key={post.id} post={post} />)
+                        suggestedPosts.map(post => <RecPostCard key={post.id} post={post} />)
                     ) : (
                         <div>No suggested posts.</div>
                     )
