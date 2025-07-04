@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
@@ -26,7 +26,7 @@ interface TradeAcceptModalProps {
   offeredItem: Item | null;
   tradingPartner: User | null;
   requestedItem: Item | null;
-}
+} 
 
 const TradeAcceptModal: React.FC<TradeAcceptModalProps> = ({
   isOpen,
@@ -36,7 +36,40 @@ const TradeAcceptModal: React.FC<TradeAcceptModalProps> = ({
   tradingPartner,
   requestedItem,
 }) => {
+
+  const router = useRouter();
+
   if (!isOpen) return null;
+
+  const handleAcceptTrade = () => {
+    if (loggedInUser && offeredItem && tradingPartner && requestedItem) {
+      const queryParams = new URLSearchParams();
+      queryParams.append('loggedInUserId', loggedInUser.id);
+      queryParams.append('loggedInUserName', loggedInUser.username);
+      queryParams.append('loggedInUserAvatar', loggedInUser.avatar);
+
+      queryParams.append('offeredItemId', offeredItem.id.toString());
+      queryParams.append('offeredItemName', offeredItem.name);
+      queryParams.append('offeredItemDescription', offeredItem.description);
+      queryParams.append('offeredItemImageUrl', offeredItem.imageUrl);
+
+      queryParams.append('tradingPartnerId', tradingPartner.id);
+      queryParams.append('tradingPartnerName', tradingPartner.username);
+      queryParams.append('tradingPartnerAvatar', tradingPartner.avatar);
+
+      queryParams.append('requestedItemId', requestedItem.id.toString());
+      queryParams.append('requestedItemName', requestedItem.name);
+      queryParams.append('requestedItemDescription', requestedItem.description);
+      queryParams.append('requestedItemImageUrl', requestedItem.imageUrl);
+
+      // Navigate to the meetup page with the trade details
+      router.push(`/pages/meetup?${queryParams.toString()}`);
+      onClose(); // Close the modal after navigating
+    } else {
+      // Handle cases where essential trade details are missing (e.g., show an alert)
+      alert("Cannot accept trade: Missing essential trade details.");
+    }
+  };
 
   return (
     <div
@@ -86,7 +119,7 @@ const TradeAcceptModal: React.FC<TradeAcceptModalProps> = ({
           <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded mr-2">
             Decline
           </button>
-          <button className="bg-green-500 text-white px-4 py-2 rounded">
+          <button onClick={handleAcceptTrade} className="bg-green-500 text-white px-4 py-2 rounded">
             Accept Trade
           </button>
         </div>
